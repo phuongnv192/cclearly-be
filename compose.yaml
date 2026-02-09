@@ -5,7 +5,7 @@ services:
     container_name: sqlserver_db
     environment:
       - 'ACCEPT_EULA=Y'
-      - 'MSSQL_SA_PASSWORD=VerySecretPassword123!'
+      - 'MSSQL_SA_PASSWORD=${DB_PASSWORD:-VerySecretPassword123!}'
       - 'MSSQL_PID=Express'
     ports:
       - '1433:1433'
