@@ -16,6 +16,6 @@ public class NotificationTemplate {
   @Column(name = "template_code", length = 255)
   private String templateCode;
 
-  @Column(name = "body_html", columnDefinition = "TEXT")
+  @Column(name = "body_html", columnDefinition = "NVARCHAR(MAX)")
   private String bodyHtml;
 }

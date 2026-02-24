@@ -31,6 +31,6 @@ public class Prescription {
     @Column(name = "validation_status", length = 50)
     private String validationStatus;
 
-    @Column(name = "sales_note", columnDefinition = "TEXT")
+    @Column(name = "sales_note", columnDefinition = "NVARCHAR(MAX)")
     private String salesNote;
 }

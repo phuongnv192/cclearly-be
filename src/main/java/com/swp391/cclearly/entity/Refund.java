@@ -27,7 +27,7 @@ public class Refund {
   @Column(name = "amount", precision = 19, scale = 2)
   private BigDecimal amount;
 
-  @Column(name = "reason", columnDefinition = "TEXT")
+  @Column(name = "reason", columnDefinition = "NVARCHAR(MAX)")
   private String reason;
 
   @Column(name = "status", length = 50)

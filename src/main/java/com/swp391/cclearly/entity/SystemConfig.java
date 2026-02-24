@@ -16,7 +16,7 @@ public class SystemConfig {
   @Column(name = "config_key", length = 100)
   private String configKey;
 
-  @Column(name = "config_value", columnDefinition = "TEXT")
+  @Column(name = "config_value", columnDefinition = "NVARCHAR(MAX)")
   private String configValue;
 
   @Column(name = "config_group", length = 50)
