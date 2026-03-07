@@ -41,10 +41,13 @@ public class SecurityConfig {
           return corsConfig;
         }))
         .authorizeHttpRequests(auth -> auth
+            // 🔒 Auth endpoints that require authentication
+            .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
+
             // ✅ Public endpoints - Auth APIs
             .requestMatchers(
-                "/api/v1/auth/**",
-                "/api/v1/public/**",
+                "/api/auth/**",
+                "/api/public/**",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
                 "/swagger-resources/**",
@@ -56,32 +59,41 @@ public class SecurityConfig {
 
             // ✅ Public GET endpoints - Products
             .requestMatchers(HttpMethod.GET,
-                "/api/v1/products/**",
-                "/api/v1/frames/**",
-                "/api/v1/lenses/**",
-                "/api/v1/accessories/**",
-                "/api/v1/categories/**"
+                "/api/products/**",
+                "/api/frames/**",
+                "/api/lenses/**",
+                "/api/accessories/**",
+                "/api/categories/**"
             ).permitAll()
 
             // 🔒 Admin only endpoints
-            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
             // 🔒 Manager endpoints
-            .requestMatchers("/api/v1/manager/**").hasAnyRole("ADMIN", "MANAGER")
+            .requestMatchers("/api/manager/**").hasAnyRole("ADMIN", "MANAGER")
 
             // 🔒 Sales Staff endpoints
-            .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasAnyRole("ADMIN", "MANAGER", "SALES_STAFF")
-            .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasAnyRole("ADMIN", "MANAGER", "SALES_STAFF")
-            .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasAnyRole("ADMIN", "MANAGER")
+            .requestMatchers(HttpMethod.POST, "/api/products/**").hasAnyRole("ADMIN", "MANAGER", "SALES_STAFF")
+            .requestMatchers(HttpMethod.PUT, "/api/products/**").hasAnyRole("ADMIN", "MANAGER", "SALES_STAFF")
+            .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasAnyRole("ADMIN", "MANAGER")
 
             // 🔒 Operation Staff endpoints
-            .requestMatchers("/api/v1/inventory/**").hasAnyRole("ADMIN", "MANAGER", "OPERATION_STAFF")
-            .requestMatchers("/api/v1/shipping/**").hasAnyRole("ADMIN", "MANAGER", "OPERATION_STAFF")
+            .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "MANAGER", "OPERATION_STAFF")
+            .requestMatchers("/api/shipping/**").hasAnyRole("ADMIN", "MANAGER", "OPERATION_STAFF")
+
+            // 🔒 Returns/Refunds - Sales & Operation staff
+            .requestMatchers("/api/returns/**").hasAnyRole("ADMIN", "MANAGER", "SALES_STAFF", "OPERATION_STAFF")
+
+            // 🔒 Promotions - Admin & Manager
+            .requestMatchers("/api/promotions/**").hasAnyRole("ADMIN", "MANAGER")
+
+            // 🔒 Banners - Admin only
+            .requestMatchers("/api/banners/**").hasAnyRole("ADMIN", "MANAGER")
 
             // 🔒 Customer endpoints
-            .requestMatchers("/api/v1/user/**").hasAnyRole("CUSTOMER", "ADMIN")
-            .requestMatchers("/api/v1/orders/**").authenticated()
-            .requestMatchers("/api/v1/cart/**").authenticated()
+            .requestMatchers("/api/users/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER", "SALES_STAFF")
+            .requestMatchers("/api/orders/**").authenticated()
+            .requestMatchers("/api/cart/**").authenticated()
 
             // 🔒 All other requests require authentication
             .anyRequest().authenticated()

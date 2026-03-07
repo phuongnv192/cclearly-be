@@ -2,20 +2,23 @@ package com.swp391.cclearly.controller;
 
 import com.swp391.cclearly.dto.auth.*;
 import com.swp391.cclearly.dto.base.ApiResponse;
+import com.swp391.cclearly.entity.User;
 import com.swp391.cclearly.service.AuthService;
 import com.swp391.cclearly.service.OAuth2Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "APIs xác thực người dùng: đăng ký, đăng nhập, quên mật khẩu")
 public class AuthController {
@@ -124,6 +127,16 @@ public class AuthController {
   }
 
   @Operation(
+      summary = "Gửi lại email xác thực",
+      description = "Gửi lại email xác thực cho người dùng. Alias của resend-otp."
+  )
+  @PostMapping("/resend-verification")
+  public ResponseEntity<ApiResponse<Void>> resendVerification(
+      @Valid @RequestBody ResendOtpRequest request) {
+    return ResponseEntity.ok(authService.resendOtp(request));
+  }
+
+  @Operation(
       summary = "Quên mật khẩu",
       description = "Yêu cầu đặt lại mật khẩu. Hệ thống sẽ gửi link reset password qua email."
   )
@@ -161,5 +174,26 @@ public class AuthController {
   public ResponseEntity<ApiResponse<Void>> resetPassword(
       @Valid @RequestBody ResetPasswordRequest request) {
     return ResponseEntity.ok(authService.resetPassword(request));
+  }
+
+  @Operation(summary = "Đăng xuất", description = "Đăng xuất người dùng. Token sẽ được xóa phía client.")
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout() {
+    return ResponseEntity.ok(authService.logout());
+  }
+
+  @Operation(summary = "Làm mới token", description = "Sử dụng refresh token để lấy access token mới.")
+  @PostMapping("/refresh-token")
+  public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
+      @Valid @RequestBody RefreshTokenRequest request) {
+    return ResponseEntity.ok(authService.refreshToken(request));
+  }
+
+  @Operation(summary = "Lấy thông tin người dùng hiện tại", description = "Trả về thông tin của người dùng đang đăng nhập.")
+  @SecurityRequirement(name = "bearerAuth")
+  @GetMapping("/me")
+  public ResponseEntity<ApiResponse<AuthResponse.UserInfo>> getCurrentUser(
+      @AuthenticationPrincipal User user) {
+    return ResponseEntity.ok(authService.getCurrentUser(user));
   }
 }

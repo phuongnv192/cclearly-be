@@ -246,13 +246,61 @@ public class AuthService {
 
   // === Private helper methods ===
 
+  /**
+   * Logout - stateless JWT, just return success (client clears token)
+   */
+  public ApiResponse<Void> logout() {
+    return ApiResponse.success("Đăng xuất thành công", null);
+  }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  public ApiResponse<AuthResponse> refreshToken(RefreshTokenRequest request) {
+    String refreshToken = request.getRefreshToken();
+
+    if (!jwtService.validateToken(refreshToken)) {
+      throw new BadRequestException("Refresh token không hợp lệ hoặc đã hết hạn");
+    }
+
+    String email = jwtService.extractEmail(refreshToken);
+    User user =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));
+
+    AuthResponse authResponse = generateAuthResponse(user);
+    return ApiResponse.success("Làm mới token thành công", authResponse);
+  }
+
+  /**
+   * Get current user profile from authenticated user
+   */
+  public ApiResponse<AuthResponse.UserInfo> getCurrentUser(User user) {
+    AuthResponse.UserInfo userInfo =
+        AuthResponse.UserInfo.builder()
+            .userId(user.getUserId())
+            .email(user.getEmail())
+            .fullName(user.getFullName())
+            .phoneNumber(user.getPhoneNumber())
+            .role(user.getRole().getRoleName())
+            .isEmailVerified(Boolean.TRUE.equals(user.getIsEmailVerified()))
+            .build();
+
+    return ApiResponse.success("Lấy thông tin thành công", userInfo);
+  }
+
   private AuthResponse generateAuthResponse(User user) {
-    String token =
+    String accessToken =
         jwtService.generateToken(
             user.getEmail(), user.getRole().getRoleName(), user.getUserId());
 
+    String refreshToken =
+        jwtService.generateRefreshToken(user.getEmail(), user.getUserId());
+
     return AuthResponse.builder()
-        .token(token)
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
         .tokenType("Bearer")
         .expiresIn(jwtService.getTokenExpiration() / 1000) // Convert to seconds
         .user(

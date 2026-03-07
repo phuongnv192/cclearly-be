@@ -30,6 +30,22 @@ public class Promotion {
   @Column(name = "value", precision = 19, scale = 2)
   private BigDecimal value;
 
+  @Column(name = "description", length = 500)
+  private String description;
+
+  @Column(name = "min_order", precision = 19, scale = 2)
+  private BigDecimal minOrder;
+
+  @Column(name = "max_discount", precision = 19, scale = 2)
+  private BigDecimal maxDiscount;
+
+  @Column(name = "usage_limit")
+  private Integer usageLimit;
+
+  @Column(name = "is_active")
+  @Builder.Default
+  private Boolean isActive = true;
+
   @OneToMany(mappedBy = "coupon")
   private Set<Order> orders = new HashSet<>();
 }

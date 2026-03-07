@@ -29,6 +29,9 @@ public class JwtService {
   @Value("${jwt.expiration:86400000}")
   private long tokenExpiration; // Default 24 hours
 
+  @Value("${jwt.refresh-expiration:604800000}")
+  private long refreshTokenExpiration; // Default 7 days
+
   private SecretKey key;
 
   @PostConstruct
@@ -50,6 +53,23 @@ public class JwtService {
         .subject(email)
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + tokenExpiration))
+        .signWith(key)
+        .compact();
+  }
+
+  /**
+   * Generate long-lived refresh token
+   */
+  public String generateRefreshToken(String email, UUID userId) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("userId", userId.toString());
+    claims.put("type", "refresh");
+
+    return Jwts.builder()
+        .claims(claims)
+        .subject(email)
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
         .signWith(key)
         .compact();
   }
@@ -135,5 +155,9 @@ public class JwtService {
 
   public long getTokenExpiration() {
     return tokenExpiration;
+  }
+
+  public long getRefreshTokenExpiration() {
+    return refreshTokenExpiration;
   }
 }

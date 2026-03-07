@@ -2,6 +2,7 @@ package com.swp391.cclearly.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +38,12 @@ public class Order {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "coupon_id", referencedColumnName = "promotion_id")
   private Promotion coupon;
+
+  @Column(name = "tracking_number", length = 100)
+  private String trackingNumber;
+
+  @Column(name = "created_at")
+  private Instant createdAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")

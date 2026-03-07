@@ -15,12 +15,15 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
 
   @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-  private String token;
+  private String accessToken;
+
+  @Schema(description = "JWT refresh token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+  private String refreshToken;
 
   @Schema(description = "Loại token", example = "Bearer")
   private String tokenType;
 
-  @Schema(description = "Thời gian hết hạn (milliseconds)", example = "86400000")
+  @Schema(description = "Thời gian hết hạn (seconds)", example = "86400")
   private long expiresIn;
 
   @Schema(description = "Thông tin người dùng")

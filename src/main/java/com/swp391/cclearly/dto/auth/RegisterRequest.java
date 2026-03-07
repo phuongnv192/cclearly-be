@@ -1,5 +1,6 @@
 package com.swp391.cclearly.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,9 +28,11 @@ public class RegisterRequest {
   @Schema(description = "Họ và tên", example = "Nguyễn Văn A", requiredMode = Schema.RequiredMode.REQUIRED)
   @NotBlank(message = "Họ tên không được để trống")
   @Size(max = 100, message = "Họ tên không được quá 100 ký tự")
+  @JsonAlias({"name"})
   private String fullName;
 
   @Schema(description = "Số điện thoại", example = "0901234567")
   @Size(max = 20, message = "Số điện thoại không được quá 20 ký tự")
+  @JsonAlias({"phone"})
   private String phoneNumber;
 }

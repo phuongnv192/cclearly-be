@@ -86,14 +86,20 @@ public class OAuth2Service {
     }
 
     // Generate JWT token
-    String token = jwtService.generateToken(
+    String accessToken = jwtService.generateToken(
         user.getEmail(),
         user.getRole().getRoleName(),
         user.getUserId()
     );
 
+    String refreshToken = jwtService.generateRefreshToken(
+        user.getEmail(),
+        user.getUserId()
+    );
+
     AuthResponse authResponse = AuthResponse.builder()
-        .token(token)
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
         .tokenType("Bearer")
         .expiresIn(jwtService.getTokenExpiration() / 1000)
         .user(AuthResponse.UserInfo.builder()
