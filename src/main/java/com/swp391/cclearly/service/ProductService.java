@@ -84,6 +84,7 @@ public class ProductService {
     Product product = Product.builder()
         .name(request.getName())
         .categoryType(request.getType())
+        .subCategory(request.getSubCategory())
         .basePrice(request.getPrice())
         .isActive(true)
         .variants(new HashSet<>())
@@ -97,9 +98,9 @@ public class ProductService {
           .product(product)
           .material(fa.getMaterial())
           .shape(fa.getShape())
-          .totalWidthMm(fa.getFrameWidth())
           .lensWidthMm(fa.getLensWidth())
           .bridgeWidthMm(fa.getBridgeWidth())
+          .templeLengthMm(fa.getTempleLength())
           .build();
       product.setProductFrame(frame);
     }
@@ -109,12 +110,28 @@ public class ProductService {
       var la = request.getLensAttributes();
       ProductLens lens = ProductLens.builder()
           .product(product)
+          .material(la.getMaterial())
           .lensType(la.getType())
           .build();
       product.setProductLens(lens);
     }
 
     product = productRepository.save(product);
+
+    // Product-level images
+    if (request.getImageUrls() != null) {
+      int order = 0;
+      for (String imgUrl : request.getImageUrls()) {
+        ProductImage img = ProductImage.builder()
+            .product(product)
+            .variant(null)
+            .imageUrl(imgUrl)
+            .displayOrder(order++)
+            .build();
+        productImageRepository.save(img);
+        product.getImages().add(img);
+      }
+    }
 
     // Variants
     if (request.getVariants() != null) {
@@ -123,6 +140,7 @@ public class ProductService {
             .product(product)
             .sku(vr.getSku())
             .colorName(vr.getColorName())
+            .refractiveIndex(vr.getRefractiveIndex())
             .salePrice(vr.getSalePrice())
             .isPreorder(vr.getIsPreorder() != null ? vr.getIsPreorder() : false)
             .images(new HashSet<>())
@@ -141,6 +159,9 @@ public class ProductService {
         }
         product.getVariants().add(variant);
       }
+
+      // Auto-calculate basePrice = MIN(variant.salePrice) for frame/lens
+      recalculateBasePrice(product);
     }
 
     return ApiResponse.success("Tạo sản phẩm thành công", toResponse(product));
@@ -153,6 +174,7 @@ public class ProductService {
 
     if (request.getName() != null) product.setName(request.getName());
     if (request.getType() != null) product.setCategoryType(request.getType());
+    if (request.getSubCategory() != null) product.setSubCategory(request.getSubCategory());
     if (request.getPrice() != null) product.setBasePrice(request.getPrice());
     if (request.getIsActive() != null) product.setIsActive(request.getIsActive());
 
@@ -166,9 +188,9 @@ public class ProductService {
       }
       if (fa.getMaterial() != null) frame.setMaterial(fa.getMaterial());
       if (fa.getShape() != null) frame.setShape(fa.getShape());
-      if (fa.getFrameWidth() != null) frame.setTotalWidthMm(fa.getFrameWidth());
       if (fa.getLensWidth() != null) frame.setLensWidthMm(fa.getLensWidth());
       if (fa.getBridgeWidth() != null) frame.setBridgeWidthMm(fa.getBridgeWidth());
+      if (fa.getTempleLength() != null) frame.setTempleLengthMm(fa.getTempleLength());
     }
 
     // Update lens attributes
@@ -180,9 +202,87 @@ public class ProductService {
         product.setProductLens(lens);
       }
       if (la.getType() != null) lens.setLensType(la.getType());
+      if (la.getMaterial() != null) lens.setMaterial(la.getMaterial());
     }
 
     productRepository.save(product);
+
+    // Update product-level images (replace all)
+    if (request.getImageUrls() != null) {
+      // Remove old product-level images (variant == null)
+      List<ProductImage> oldImages = product.getImages().stream()
+          .filter(img -> img.getVariant() == null)
+          .collect(Collectors.toList());
+      productImageRepository.deleteAll(oldImages);
+      product.getImages().removeAll(oldImages);
+
+      // Add new images
+      int order = 0;
+      for (String imgUrl : request.getImageUrls()) {
+        ProductImage img = ProductImage.builder()
+            .product(product)
+            .variant(null)
+            .imageUrl(imgUrl)
+            .displayOrder(order++)
+            .build();
+        productImageRepository.save(img);
+        product.getImages().add(img);
+      }
+    }
+
+    // Update variants
+    if (request.getVariants() != null) {
+      // Collect existing variant IDs from request
+      var requestVariantIds = request.getVariants().stream()
+          .filter(vr -> vr.getVariantId() != null)
+          .map(CreateProductRequest.VariantRequest::getVariantId)
+          .collect(Collectors.toSet());
+
+      // Delete variants that were removed (not in request anymore)
+      var toRemove = product.getVariants().stream()
+          .filter(v -> !requestVariantIds.contains(v.getVariantId()))
+          .collect(Collectors.toList());
+      for (ProductVariant v : toRemove) {
+        product.getVariants().remove(v);
+        productVariantRepository.delete(v);
+      }
+
+      // Update existing or create new variants
+      for (var vr : request.getVariants()) {
+        if (vr.getVariantId() != null) {
+          // Update existing variant
+          ProductVariant existing = product.getVariants().stream()
+              .filter(v -> v.getVariantId().equals(vr.getVariantId()))
+              .findFirst()
+              .orElse(null);
+          if (existing != null) {
+            existing.setSku(vr.getSku());
+            existing.setColorName(vr.getColorName());
+            existing.setRefractiveIndex(vr.getRefractiveIndex());
+            existing.setSalePrice(vr.getSalePrice());
+            if (vr.getIsPreorder() != null) existing.setIsPreorder(vr.getIsPreorder());
+            productVariantRepository.save(existing);
+          }
+        } else {
+          // Create new variant
+          ProductVariant variant = ProductVariant.builder()
+              .product(product)
+              .sku(vr.getSku())
+              .colorName(vr.getColorName())
+              .refractiveIndex(vr.getRefractiveIndex())
+              .salePrice(vr.getSalePrice())
+              .isPreorder(vr.getIsPreorder() != null ? vr.getIsPreorder() : false)
+              .images(new HashSet<>())
+              .build();
+          variant = productVariantRepository.save(variant);
+          product.getVariants().add(variant);
+        }
+      }
+    }
+
+    // Recalculate basePrice from variants for frame/lens
+    recalculateBasePrice(product);
+
     return ApiResponse.success("Cập nhật sản phẩm thành công", toResponse(product));
   }
 
@@ -193,6 +293,25 @@ public class ProductService {
     product.setIsActive(false);
     productRepository.save(product);
     return ApiResponse.success("Xóa sản phẩm thành công", null);
+  }
+
+  /**
+   * Auto-set basePrice = MIN(variant.salePrice) for frame/lens products.
+   * Accessory keeps the manually-entered basePrice.
+   */
+  private void recalculateBasePrice(Product product) {
+    if (product.getVariants() == null || product.getVariants().isEmpty()) return;
+    String type = product.getCategoryType() != null ? product.getCategoryType().toLowerCase() : "";
+    if ("frame".equals(type) || "lens".equals(type)) {
+      product.getVariants().stream()
+          .filter(v -> v.getSalePrice() != null)
+          .map(ProductVariant::getSalePrice)
+          .min(java.math.BigDecimal::compareTo)
+          .ifPresent(minPrice -> {
+            product.setBasePrice(minPrice);
+            productRepository.save(product);
+          });
+    }
   }
 
   private ProductResponse toResponse(Product p) {
@@ -225,6 +344,7 @@ public class ProductService {
             .variantId(v.getVariantId())
             .sku(v.getSku())
             .colorName(v.getColorName())
+            .refractiveIndex(v.getRefractiveIndex())
             .salePrice(v.getSalePrice())
             .isPreorder(v.getIsPreorder())
             .images(v.getImages().stream().map(ProductImage::getImageUrl).collect(Collectors.toList()))
@@ -234,7 +354,8 @@ public class ProductService {
     ProductResponse.ProductResponseBuilder builder = ProductResponse.builder()
         .id(p.getProductId())
         .name(p.getName())
-        .type(p.getCategoryType())
+        .type(p.getCategoryType() != null ? p.getCategoryType().toLowerCase() : null)
+        .subCategory(p.getSubCategory())
         .basePrice(p.getBasePrice())
         .isActive(p.getIsActive())
         .isSale(isSale)
@@ -247,9 +368,9 @@ public class ProductService {
       builder.frame(ProductResponse.FrameInfo.builder()
           .material(f.getMaterial())
           .shape(f.getShape())
-          .totalWidthMm(f.getTotalWidthMm())
           .lensWidthMm(f.getLensWidthMm())
           .bridgeWidthMm(f.getBridgeWidthMm())
+          .templeLengthMm(f.getTempleLengthMm())
           .build());
     }
 
@@ -257,6 +378,10 @@ public class ProductService {
       var l = p.getProductLens();
       builder.lens(ProductResponse.LensInfo.builder()
           .lensType(l.getLensType())
+          .material(l.getMaterial())
+          .technologies(l.getTechnologies().stream()
+              .map(t -> t.getName())
+              .collect(Collectors.toList()))
           .build());
     }
 
@@ -268,7 +393,7 @@ public class ProductService {
   }
 
   private static Specification<Product> hasType(String type) {
-    return (root, query, cb) -> cb.equal(root.get("categoryType"), type);
+    return (root, query, cb) -> cb.equal(cb.lower(root.get("categoryType")), type.toLowerCase());
   }
 
   private static Specification<Product> nameContains(String search) {

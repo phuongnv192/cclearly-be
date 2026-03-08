@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -18,7 +19,9 @@ public class CreateProductRequest {
   @NotNull(message = "Giá cơ bản không được để trống")
   private BigDecimal price;
 
+  private String subCategory;
   private String description;
+  private List<String> imageUrls;
 
   // Frame-specific attributes
   private FrameAttributes frameAttributes;
@@ -33,30 +36,24 @@ public class CreateProductRequest {
   public static class FrameAttributes {
     private String material;
     private String shape;
-    private String color;
+    private Integer lensWidth;
     private Integer bridgeWidth;
     private Integer templeLength;
-    private Integer lensWidth;
-    private Integer frameWidth;
-    private String origin;
-    private String warranty;
   }
 
   @Data
   public static class LensAttributes {
-    private String index;
     private String material;
-    private String technology;
-    private String coating;
-    private String diameter;
-    private String type;
-    private String brand;
+    private String type; // lens type: Đơn tròng, Đa tròng, etc.
+    private List<String> technologies;
   }
 
   @Data
   public static class VariantRequest {
+    private UUID variantId; // null for new, set for existing (update)
     private String sku;
     private String colorName;
+    private Float refractiveIndex;
     private BigDecimal salePrice;
     private Boolean isPreorder;
     private List<String> images;

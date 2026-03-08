@@ -12,6 +12,7 @@ public class ProductResponse {
   private UUID id;
   private String name;
   private String type; // frame, lens, accessory
+  private String subCategory;
   private String sku;
   private BigDecimal basePrice;
   private Boolean isActive;
@@ -28,9 +29,9 @@ public class ProductResponse {
   public static class FrameInfo {
     private String material;
     private String shape;
-    private Integer totalWidthMm;
     private Integer lensWidthMm;
     private Integer bridgeWidthMm;
+    private Integer templeLengthMm;
   }
 
   @Data
@@ -38,7 +39,7 @@ public class ProductResponse {
   public static class LensInfo {
     private String lensType;
     private String material;
-    private String coatingType;
+    private List<String> technologies;
   }
 
   @Data
@@ -47,6 +48,7 @@ public class ProductResponse {
     private UUID variantId;
     private String sku;
     private String colorName;
+    private Float refractiveIndex;
     private BigDecimal salePrice;
     private Boolean isPreorder;
     private List<String> images;

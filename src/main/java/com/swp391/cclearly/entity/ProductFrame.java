@@ -29,12 +29,12 @@ public class ProductFrame {
   @Column(name = "shape", length = 50)
   private String shape;
 
-  @Column(name = "total_width_mm")
-  private Integer totalWidthMm;
-
   @Column(name = "lens_width_mm")
   private Integer lensWidthMm;
 
   @Column(name = "bridge_width_mm")
   private Integer bridgeWidthMm;
+
+  @Column(name = "temple_length_mm")
+  private Integer templeLengthMm;
 }

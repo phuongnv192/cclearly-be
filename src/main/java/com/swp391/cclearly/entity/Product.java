@@ -27,6 +27,9 @@ public class Product {
   @Column(name = "category_type", length = 50)
   private String categoryType;
 
+  @Column(name = "sub_category", length = 50)
+  private String subCategory;
+
   @Column(name = "base_price", precision = 19, scale = 2)
   private BigDecimal basePrice;
 

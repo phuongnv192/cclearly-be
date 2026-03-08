@@ -193,38 +193,36 @@ public class OrderService {
           .orElseThrow(() -> new BadRequestException("Đơn hàng không có sản phẩm"));
     }
 
-    // Build Rx data JSON for salesNote (since entity only has sphOd field)
-    String rxJson = String.format(
-        "{\"rightEye\":{\"sph\":%.2f,\"cyl\":%.2f,\"axis\":%.2f,\"add\":%.2f}," +
-        "\"leftEye\":{\"sph\":%.2f,\"cyl\":%.2f,\"axis\":%.2f,\"add\":%.2f},\"pd\":%.2f}",
-        request.getSphOd() != null ? request.getSphOd() : 0f,
-        request.getCylOd() != null ? request.getCylOd() : 0f,
-        request.getAxisOd() != null ? request.getAxisOd() : 0f,
-        request.getAddOd() != null ? request.getAddOd() : 0f,
-        request.getSphOs() != null ? request.getSphOs() : 0f,
-        request.getCylOs() != null ? request.getCylOs() : 0f,
-        request.getAxisOs() != null ? request.getAxisOs() : 0f,
-        request.getAddOs() != null ? request.getAddOs() : 0f,
-        request.getPd() != null ? request.getPd() : 0f
-    );
-
     Prescription prescription = targetItem.getPrescription();
     if (prescription == null) {
       prescription = Prescription.builder()
           .orderItem(targetItem)
           .sphOd(request.getSphOd())
+          .cylOd(request.getCylOd())
+          .axisOd(request.getAxisOd())
+          .addOd(request.getAddOd())
+          .sphOs(request.getSphOs())
+          .cylOs(request.getCylOs())
+          .axisOs(request.getAxisOs())
+          .addOs(request.getAddOs())
+          .pd(request.getPd())
           .imageUrl(request.getImageUrl())
           .validationStatus("PENDING")
-          .salesNote(rxJson)
+          .salesNote(request.getSalesNote())
           .build();
       targetItem.setPrescription(prescription);
     } else {
-      prescription.setSphOd(request.getSphOd());
+      if (request.getSphOd() != null) prescription.setSphOd(request.getSphOd());
+      if (request.getCylOd() != null) prescription.setCylOd(request.getCylOd());
+      if (request.getAxisOd() != null) prescription.setAxisOd(request.getAxisOd());
+      if (request.getAddOd() != null) prescription.setAddOd(request.getAddOd());
+      if (request.getSphOs() != null) prescription.setSphOs(request.getSphOs());
+      if (request.getCylOs() != null) prescription.setCylOs(request.getCylOs());
+      if (request.getAxisOs() != null) prescription.setAxisOs(request.getAxisOs());
+      if (request.getAddOs() != null) prescription.setAddOs(request.getAddOs());
+      if (request.getPd() != null) prescription.setPd(request.getPd());
       if (request.getImageUrl() != null) prescription.setImageUrl(request.getImageUrl());
-      prescription.setSalesNote(rxJson);
-      if (request.getSalesNote() != null) {
-        prescription.setSalesNote(rxJson + " | Note: " + request.getSalesNote());
-      }
+      if (request.getSalesNote() != null) prescription.setSalesNote(request.getSalesNote());
     }
 
     orderItemRepository.save(targetItem);

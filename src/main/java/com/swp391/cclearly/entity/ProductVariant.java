@@ -32,6 +32,9 @@ public class ProductVariant {
     @Column(name = "color_name", length = 50)
     private String colorName;
 
+    @Column(name = "refractive_index")
+    private Float refractiveIndex;
+
     @Column(name = "sale_price", precision = 19, scale = 2)
     private BigDecimal salePrice;
 

@@ -24,8 +24,8 @@ public class ProductLens {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "refractive_index")
-    private Float refractiveIndex;
+    @Column(name = "material", length = 100)
+    private String material;
 
     @Column(name = "lens_type", length = 50)
     private String lensType;

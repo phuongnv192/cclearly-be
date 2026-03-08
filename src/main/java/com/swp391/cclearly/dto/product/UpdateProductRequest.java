@@ -10,7 +10,9 @@ public class UpdateProductRequest {
   private String name;
   private String type;
   private BigDecimal price;
+  private String subCategory;
   private String description;
+  private List<String> imageUrls;
   private Boolean isActive;
 
   // Frame-specific attributes
