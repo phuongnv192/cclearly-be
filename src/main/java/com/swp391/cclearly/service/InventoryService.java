@@ -32,6 +32,7 @@ public class InventoryService {
   private final ProductVariantRepository productVariantRepository;
   private final WarehouseRepository warehouseRepository;
   private final StockMovementRepository stockMovementRepository;
+  private final AuditLogService auditLogService;
 
   public ApiResponse<List<InventoryResponse>> getInventory(String search, UUID warehouseId) {
     List<InventoryStock> allStocks = inventoryStockRepository.findAll();
@@ -145,6 +146,9 @@ public class InventoryService {
         .warehouseStocks(warehouseStocks)
         .build();
 
+    auditLogService.log("IMPORT_STOCK",
+        "Nhập " + request.getQuantity() + " " + variant.getProduct().getName()
+            + " (SKU: " + variant.getSku() + ") vào kho " + warehouse.getName());
     return ApiResponse.success("Nhập kho thành công", response);
   }
 }

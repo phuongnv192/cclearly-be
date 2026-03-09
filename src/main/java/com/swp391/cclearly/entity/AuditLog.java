@@ -1,6 +1,7 @@
 package com.swp391.cclearly.entity;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
 
@@ -25,9 +26,24 @@ public class AuditLog {
     @Column(name = "action", length = 255)
     private String action;
 
+    @Column(name = "details", columnDefinition = "NVARCHAR(MAX)")
+    private String details;
+
     @Column(name = "old_value", columnDefinition = "NVARCHAR(MAX)")
     private String oldValue;
 
     @Column(name = "new_value", columnDefinition = "NVARCHAR(MAX)")
     private String newValue;
+
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
+
+    @Builder.Default
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) createdAt = Instant.now();
+    }
 }

@@ -24,6 +24,12 @@ public class Address {
   @JoinColumn(name = "user_id")
   private User user;
 
+  @Column(name = "name", length = 100)
+  private String name;
+
+  @Column(name = "phone", length = 20)
+  private String phone;
+
   @Column(name = "street", length = 255)
   private String street;
 

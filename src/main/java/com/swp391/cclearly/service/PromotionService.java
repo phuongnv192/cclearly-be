@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PromotionService {
 
   private final PromotionRepository promotionRepository;
+  private final AuditLogService auditLogService;
 
   public ApiResponse<List<PromotionResponse>> getAllPromotions() {
     List<PromotionResponse> response = promotionRepository.findAll().stream()
@@ -52,6 +53,9 @@ public class PromotionService {
         .build();
 
     promotion = promotionRepository.save(promotion);
+    auditLogService.log("ADD_VOUCHER",
+        "Tạo voucher " + promotion.getCode()
+            + " giảm " + promotion.getValue() + ("PERCENT".equals(promotion.getDiscountType()) ? "%" : "đ"));
     return ApiResponse.success("Tạo khuyến mãi thành công", toResponse(promotion));
   }
 
@@ -70,6 +74,8 @@ public class PromotionService {
     if (request.getIsActive() != null) promotion.setIsActive(request.getIsActive());
 
     promotionRepository.save(promotion);
+    auditLogService.log("UPDATE_VOUCHER",
+        "Cập nhật voucher: " + promotion.getCode());
     return ApiResponse.success("Cập nhật khuyến mãi thành công", toResponse(promotion));
   }
 
@@ -78,6 +84,8 @@ public class PromotionService {
     Promotion promotion = promotionRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy khuyến mãi"));
     promotionRepository.delete(promotion);
+    auditLogService.log("DELETE_VOUCHER",
+        "Xóa voucher: " + promotion.getCode());
     return ApiResponse.success("Xóa khuyến mãi thành công", null);
   }
 

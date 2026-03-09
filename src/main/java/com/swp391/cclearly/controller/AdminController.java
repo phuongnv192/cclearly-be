@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -89,8 +90,10 @@ public class AdminController {
   @GetMapping("/logs")
   public ResponseEntity<ApiResponse<AuditLogPageResponse>> getAuditLogs(
       @RequestParam(required = false) String action,
-      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(required = false) LocalDate fromDate,
+      @RequestParam(required = false) LocalDate toDate,
+      @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ResponseEntity.ok(adminService.getAuditLogs(action, page, size));
+    return ResponseEntity.ok(adminService.getAuditLogs(action, fromDate, toDate, page, size));
   }
 }

@@ -676,11 +676,220 @@ IF NOT EXISTS (SELECT * FROM [System_Configs] WHERE config_key = 'order_expiry_m
 -- =============================================
 -- 15. CONTENT_BANNERS
 -- =============================================
-IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE position = 'HOME_HERO')
-    INSERT INTO [Content_Banners] (banner_id, image_url, position) VALUES (NEWID(), 'https://res.cloudinary.com/cclearly/image/upload/v1/banners/hero-main.jpg', 'HOME_HERO');
+-- NOTE: Sử dụng ảnh placeholder từ Unsplash. Để có ảnh thật, upload lên Cloudinary:
+-- 1. Đăng nhập tài khoản Cloudinary
+-- 2. Sử dụng API upload có sẵn: POST /api/upload/image (folder='banners')
+-- 3. Hoặc upload trực tiếp qua Cloudinary Console > Media Library > Upload
+-- 4. Copy URL trả về và cập nhật vào banner qua trang admin
 
-IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE position = 'HOME_PROMO')
-    INSERT INTO [Content_Banners] (banner_id, image_url, position) VALUES (NEWID(), 'https://res.cloudinary.com/cclearly/image/upload/v1/banners/promo-summer.jpg', 'HOME_PROMO');
+IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE title = N'Miễn phí đo mắt & tư vấn')
+    INSERT INTO [Content_Banners] (banner_id, title, image_url, position, display_order, is_active)
+    VALUES (NEWID(), N'Miễn phí đo mắt & tư vấn', 'https://images.unsplash.com/photo-1516062423079-7ca13cdc7f5a?q=80&w=2083&auto=format&fit=crop', 'HEADER', 1, 1);
 
-IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE position = 'HOME_NEW')
-    INSERT INTO [Content_Banners] (banner_id, image_url, position) VALUES (NEWID(), 'https://res.cloudinary.com/cclearly/image/upload/v1/banners/new-arrivals.jpg', 'HOME_NEW');
+IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE title = N'Đại tiệc gọng kính - Giảm tới 50%')
+    INSERT INTO [Content_Banners] (banner_id, title, image_url, position, display_order, is_active)
+    VALUES (NEWID(), N'Đại tiệc gọng kính - Giảm tới 50%', 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?q=80&w=2070&auto=format&fit=crop', 'HOME_MAIN', 1, 1);
+
+IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE title = N'Kính cận thị cho trẻ em')
+    INSERT INTO [Content_Banners] (banner_id, title, image_url, position, display_order, is_active)
+    VALUES (NEWID(), N'Kính cận thị cho trẻ em', 'https://images.unsplash.com/photo-1543332164-6e82f355badc?q=80&w=2070&auto=format&fit=crop', 'HOME_MAIN', 2, 1);
+
+IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE title = N'Bộ sưu tập Kính Râm 2026')
+    INSERT INTO [Content_Banners] (banner_id, title, image_url, position, display_order, is_active)
+    VALUES (NEWID(), N'Bộ sưu tập Kính Râm 2026', 'https://images.unsplash.com/photo-1511499767390-a73359580bf1?q=80&w=1780&auto=format&fit=crop', 'HOME_PROMO', 1, 1);
+
+IF NOT EXISTS (SELECT * FROM [Content_Banners] WHERE title = N'Flash Sale Cuối Tuần')
+    INSERT INTO [Content_Banners] (banner_id, title, image_url, position, display_order, is_active)
+    VALUES (NEWID(), N'Flash Sale Cuối Tuần', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop', 'HOME_MAIN', 3, 0);
+
+-- =============================================
+-- 16. ADDRESSES
+-- =============================================
+-- Customer 1 addresses
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer1@gmail.com' AND a.name = N'Phạm Văn Khách 1')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Phạm Văn Khách 1', '0912345678', N'123 Nguyễn Trãi, Phường Bến Thành, Quận 1', N'TP. Hồ Chí Minh', 1
+    FROM [Users] WHERE email = 'customer1@gmail.com';
+
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer1@gmail.com' AND a.name = N'Phạm Văn Khách 1 - Công ty')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Phạm Văn Khách 1 - Công ty', '0912345600', N'456 Lê Lợi, Phường Bến Nghé, Quận 1', N'TP. Hồ Chí Minh', 0
+    FROM [Users] WHERE email = 'customer1@gmail.com';
+
+-- Customer 2 addresses
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer2@gmail.com' AND a.name = N'Hoàng Thị Khách 2')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Hoàng Thị Khách 2', '0912345679', N'789 Trần Hưng Đạo, Phường 1, Quận 5', N'TP. Hồ Chí Minh', 1
+    FROM [Users] WHERE email = 'customer2@gmail.com';
+
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer2@gmail.com' AND a.name = N'Hoàng Thị Khách 2 - Nhà riêng HN')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Hoàng Thị Khách 2 - Nhà riêng HN', '0912345699', N'15 Phố Huế, Phường Hàng Bài, Quận Hoàn Kiếm', N'Hà Nội', 0
+    FROM [Users] WHERE email = 'customer2@gmail.com';
+
+-- =============================================
+-- 17. AUDIT_LOGS (Mock data)
+-- =============================================
+-- LOGIN logs
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống: admin@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống: admin@cclearly.com', '113.161.72.45', DATEADD(HOUR, -72, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống: manager@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống: manager@cclearly.com', '42.118.134.92', DATEADD(HOUR, -70, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'sales@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống: sales@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống: sales@cclearly.com', '14.232.166.78', DATEADD(HOUR, -68, GETUTCDATE())
+    FROM [Users] WHERE email = 'sales@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống: operation@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống: operation@cclearly.com', '171.252.113.201', DATEADD(HOUR, -65, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+-- ADD_PRODUCT logs (sales staff added products)
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'sales@cclearly.com' AND al.action = 'ADD_PRODUCT' AND al.details LIKE N'%Ray-Ban Aviator Classic%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_PRODUCT', N'Thêm sản phẩm: Ray-Ban Aviator Classic', '14.232.166.78', DATEADD(HOUR, -66, GETUTCDATE())
+    FROM [Users] WHERE email = 'sales@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'sales@cclearly.com' AND al.action = 'ADD_PRODUCT' AND al.details LIKE N'%Oakley Holbrook%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_PRODUCT', N'Thêm sản phẩm: Oakley Holbrook', '14.232.166.78', DATEADD(HOUR, -66, GETUTCDATE())
+    FROM [Users] WHERE email = 'sales@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'sales@cclearly.com' AND al.action = 'ADD_PRODUCT' AND al.details LIKE N'%Gucci GG0061S%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_PRODUCT', N'Thêm sản phẩm: Gucci GG0061S', '14.232.166.78', DATEADD(HOUR, -65, GETUTCDATE())
+    FROM [Users] WHERE email = 'sales@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'ADD_PRODUCT' AND al.details LIKE N'%Essilor Crizal Sapphire%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_PRODUCT', N'Thêm sản phẩm: Essilor Crizal Sapphire', '42.118.134.92', DATEADD(HOUR, -64, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'ADD_PRODUCT' AND al.details LIKE N'%Hoya Blue Control%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_PRODUCT', N'Thêm sản phẩm: Hoya Blue Control', '42.118.134.92', DATEADD(HOUR, -63, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+-- UPDATE_PRODUCT log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'sales@cclearly.com' AND al.action = 'UPDATE_PRODUCT' AND al.details LIKE N'%Tommy Hilfiger TH1794%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, old_value, new_value, ip_address, created_at)
+    SELECT NEWID(), user_id, 'UPDATE_PRODUCT', N'Cập nhật sản phẩm: Tommy Hilfiger TH1794', N'base_price: 1600000', N'base_price: 1800000', '14.232.166.78', DATEADD(HOUR, -50, GETUTCDATE())
+    FROM [Users] WHERE email = 'sales@cclearly.com';
+
+-- IMPORT_STOCK logs (operation staff imported stock)
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%RB-AV-GOLD%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 50 sản phẩm Ray-Ban Aviator Classic (SKU: RB-AV-GOLD) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -60, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%OAK-HB-BLACK%Kho chính%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 40 sản phẩm Oakley Holbrook (SKU: OAK-HB-BLACK) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -59, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%ESS-CS-1.56%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 100 sản phẩm Essilor Crizal Sapphire (SKU: ESS-CS-1.56) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -58, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%RB-AV-GOLD%Kho TP.HCM%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 20 sản phẩm Ray-Ban Aviator Classic (SKU: RB-AV-GOLD) vào Kho TP.HCM', '171.252.113.201', DATEADD(HOUR, -55, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+-- ADD_VOUCHER logs
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'ADD_VOUCHER' AND al.details LIKE N'%WELCOME10%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_VOUCHER', N'Thêm voucher: WELCOME10 - Giảm 10%', '42.118.134.92', DATEADD(HOUR, -48, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'ADD_VOUCHER' AND al.details LIKE N'%NEWYEAR50K%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_VOUCHER', N'Thêm voucher: NEWYEAR50K - Giảm 50,000₫', '42.118.134.92', DATEADD(HOUR, -47, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'ADD_VOUCHER' AND al.details LIKE N'%VIP20%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'ADD_VOUCHER', N'Thêm voucher: VIP20 - Giảm 20%', '42.118.134.92', DATEADD(HOUR, -46, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+-- UPDATE_VOUCHER log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'UPDATE_VOUCHER' AND al.details LIKE N'%WELCOME10%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, old_value, new_value, ip_address, created_at)
+    SELECT NEWID(), user_id, 'UPDATE_VOUCHER', N'Cập nhật voucher: WELCOME10', N'value: 5', N'value: 10', '42.118.134.92', DATEADD(HOUR, -40, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+-- CHANGE_BANNER logs
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'CHANGE_BANNER' AND al.details LIKE N'%HOME_HERO%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'CHANGE_BANNER', N'Cập nhật banner vị trí: HOME_HERO', '113.161.72.45', DATEADD(HOUR, -36, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'CHANGE_BANNER' AND al.details LIKE N'%HOME_PROMO%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'CHANGE_BANNER', N'Cập nhật banner vị trí: HOME_PROMO', '113.161.72.45', DATEADD(HOUR, -35, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- CREATE_USER log (admin created customer accounts)
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'CREATE_USER' AND al.details LIKE N'%sales@cclearly.com%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'CREATE_USER', N'Cấp tài khoản nhân viên: sales@cclearly.com (SALES_STAFF)', '113.161.72.45', DATEADD(HOUR, -69, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'CREATE_USER' AND al.details LIKE N'%operation@cclearly.com%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'CREATE_USER', N'Cấp tài khoản nhân viên: operation@cclearly.com (OPERATION_STAFF)', '113.161.72.45', DATEADD(HOUR, -69, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- UPDATE_USER log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'UPDATE_USER' AND al.details LIKE N'%Trần Thị Bán Hàng%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, old_value, new_value, ip_address, created_at)
+    SELECT NEWID(), user_id, 'UPDATE_USER', N'Cập nhật thông tin tài khoản: Trần Thị Bán Hàng', N'phone: 0901234500', N'phone: 0901234569', '113.161.72.45', DATEADD(HOUR, -30, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- UPDATE_SETTINGS log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'UPDATE_SETTINGS' AND al.details LIKE N'%free_shipping_threshold%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, old_value, new_value, ip_address, created_at)
+    SELECT NEWID(), user_id, 'UPDATE_SETTINGS', N'Cập nhật cấu hình hệ thống: free_shipping_threshold', N'300000', N'500000', '113.161.72.45', DATEADD(HOUR, -24, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- BAN_ACCOUNT log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'BAN_ACCOUNT')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'BAN_ACCOUNT', N'Khóa tài khoản người dùng: fake_user@gmail.com (vi phạm chính sách)', '113.161.72.45', DATEADD(HOUR, -20, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- More recent LOGIN logs (various staff re-login)
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống lần 2: manager@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống lần 2: manager@cclearly.com', '42.118.134.92', DATEADD(HOUR, -12, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'admin@cclearly.com' AND al.action = 'LOGIN' AND al.details = N'Đăng nhập hệ thống lần 2: admin@cclearly.com')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'LOGIN', N'Đăng nhập hệ thống lần 2: admin@cclearly.com', '113.161.72.45', DATEADD(HOUR, -6, GETUTCDATE())
+    FROM [Users] WHERE email = 'admin@cclearly.com';
+
+-- DELETE_PRODUCT log
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'manager@cclearly.com' AND al.action = 'DELETE_PRODUCT')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'DELETE_PRODUCT', N'Xóa sản phẩm: Test Product XYZ (sản phẩm lỗi)', '42.118.134.92', DATEADD(HOUR, -8, GETUTCDATE())
+    FROM [Users] WHERE email = 'manager@cclearly.com';
+
+-- IMPORT_STOCK recent batch
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%HY-BC-1.56%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 70 sản phẩm Hoya Blue Control (SKU: HY-BC-1.56) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -4, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';
+
+IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.user_id WHERE u.email = 'operation@cclearly.com' AND al.action = 'IMPORT_STOCK' AND al.details LIKE N'%CH-CR-1.67%')
+    INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
+    SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 55 sản phẩm Chemi Crystal (SKU: CH-CR-1.67) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -3, GETUTCDATE())
+    FROM [Users] WHERE email = 'operation@cclearly.com';

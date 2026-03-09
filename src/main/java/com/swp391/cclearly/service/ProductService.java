@@ -36,6 +36,7 @@ public class ProductService {
   private final ProductRepository productRepository;
   private final ProductVariantRepository productVariantRepository;
   private final ProductImageRepository productImageRepository;
+  private final AuditLogService auditLogService;
 
   public ApiResponse<ProductPageResponse> getProducts(String type, String search, int page, int size) {
     Pageable pageable = PageRequest.of(page - 1, size);
@@ -164,6 +165,8 @@ public class ProductService {
       recalculateBasePrice(product);
     }
 
+    auditLogService.log("ADD_PRODUCT",
+        "Thêm sản phẩm mới: " + product.getName());
     return ApiResponse.success("Tạo sản phẩm thành công", toResponse(product));
   }
 
@@ -283,6 +286,8 @@ public class ProductService {
     // Recalculate basePrice from variants for frame/lens
     recalculateBasePrice(product);
 
+    auditLogService.log("UPDATE_PRODUCT",
+        "Cập nhật sản phẩm: " + product.getName());
     return ApiResponse.success("Cập nhật sản phẩm thành công", toResponse(product));
   }
 
@@ -292,6 +297,8 @@ public class ProductService {
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
     product.setIsActive(false);
     productRepository.save(product);
+    auditLogService.log("DELETE_PRODUCT",
+        "Xóa sản phẩm: " + product.getName());
     return ApiResponse.success("Xóa sản phẩm thành công", null);
   }
 

@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class AdminService {
   private final SystemConfigRepository systemConfigRepository;
   private final RoleRepository roleRepository;
   private final AuditLogRepository auditLogRepository;
+  private final AuditLogService auditLogService;
   private final PasswordEncoder passwordEncoder;
 
   public ApiResponse<DashboardStatsResponse> getDashboardStats() {
@@ -144,6 +146,8 @@ public class AdminService {
     }
 
     userRepository.save(user);
+    auditLogService.log("UPDATE_USER",
+        "Cập nhật người dùng: " + user.getEmail());
     return ApiResponse.success("Cập nhật người dùng thành công", toAdminUserResponse(user));
   }
 
@@ -204,6 +208,8 @@ public class AdminService {
         systemConfigRepository.save(config);
       }
     }
+    auditLogService.log("UPDATE_SETTINGS",
+        "Cập nhật cấu hình hệ thống: " + request.getSettings().keySet());
     return getSettings();
   }
 
@@ -237,6 +243,8 @@ public class AdminService {
         .build();
 
     user = userRepository.save(user);
+    auditLogService.log("CREATE_USER",
+        "Tạo tài khoản mới cho nhân viên: " + user.getEmail());
     return ApiResponse.success("Tạo tài khoản thành công", toAdminUserResponse(user));
   }
 
@@ -252,6 +260,8 @@ public class AdminService {
 
     user.setStatus("INACTIVE");
     userRepository.save(user);
+    auditLogService.log("BAN_ACCOUNT",
+        "Khóa tài khoản " + user.getEmail());
 
     return ApiResponse.success("Đã vô hiệu hóa tài khoản", null);
   }
@@ -260,14 +270,31 @@ public class AdminService {
    * Lấy danh sách nhật ký hệ thống (audit logs)
    * Dùng cho: SystemLogsPage, RolePermissionPage "Audit Log" tab
    */
-  public ApiResponse<AuditLogPageResponse> getAuditLogs(String action, int page, int size) {
-    Pageable pageable = PageRequest.of(page - 1, size);
+  public ApiResponse<AuditLogPageResponse> getAuditLogs(
+      String action, LocalDate fromDate, LocalDate toDate, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
     Page<AuditLog> logPage;
 
-    if (action != null && !action.isBlank()) {
-      logPage = auditLogRepository.findByActionContainingIgnoreCaseOrderByLogIdDesc(action, pageable);
+    Instant from = (fromDate != null)
+        ? fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+        : null;
+    Instant to = (toDate != null)
+        ? toDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant()
+        : null;
+
+    boolean hasAction = action != null && !action.isBlank();
+    boolean hasDateRange = from != null && to != null;
+
+    if (hasAction && hasDateRange) {
+      logPage = auditLogRepository.findByActionAndCreatedAtBetweenOrderByCreatedAtDesc(
+          action, from, to, pageable);
+    } else if (hasAction) {
+      logPage = auditLogRepository.findByActionOrderByCreatedAtDesc(action, pageable);
+    } else if (hasDateRange) {
+      logPage = auditLogRepository.findByCreatedAtBetweenOrderByCreatedAtDesc(
+          from, to, pageable);
     } else {
-      logPage = auditLogRepository.findAllByOrderByLogIdDesc(pageable);
+      logPage = auditLogRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     List<AuditLogResponse> items = logPage.getContent().stream()
@@ -276,11 +303,11 @@ public class AdminService {
             .userId(log.getUser() != null ? log.getUser().getUserId().toString() : null)
             .userName(log.getUser() != null ? log.getUser().getFullName() : "System")
             .action(log.getAction())
+            .details(log.getDetails())
             .oldValue(log.getOldValue())
             .newValue(log.getNewValue())
-            .details(log.getOldValue() != null
-                ? "Cũ: " + log.getOldValue() + " → Mới: " + log.getNewValue()
-                : log.getNewValue())
+            .ipAddress(log.getIpAddress())
+            .createdAt(log.getCreatedAt())
             .build())
         .collect(Collectors.toList());
 

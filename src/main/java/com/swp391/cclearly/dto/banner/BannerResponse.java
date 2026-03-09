@@ -8,6 +8,9 @@ import lombok.Data;
 @Builder
 public class BannerResponse {
   private UUID bannerId;
+  private String title;
   private String imageUrl;
   private String position;
+  private Integer displayOrder;
+  private Boolean isActive;
 }

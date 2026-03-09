@@ -34,6 +34,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final EmailService emailService;
+  private final AuditLogService auditLogService;
 
   @Value("${app.otp.expiration-minutes:5}")
   private int otpExpirationMinutes;
@@ -125,6 +126,8 @@ public class AuthService {
     // Generate token
     AuthResponse authResponse = generateAuthResponse(user);
 
+    auditLogService.log(user, "LOGIN",
+        "Đăng nhập thành công: " + user.getEmail());
     return ApiResponse.success("Đăng nhập thành công", authResponse);
   }
 
