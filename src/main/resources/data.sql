@@ -893,3 +893,295 @@ IF NOT EXISTS (SELECT 1 FROM [Audit_Logs] al JOIN [Users] u ON al.user_id = u.us
     INSERT INTO [Audit_Logs] (log_id, user_id, action, details, ip_address, created_at)
     SELECT NEWID(), user_id, 'IMPORT_STOCK', N'Nhập kho 55 sản phẩm Chemi Crystal (SKU: CH-CR-1.67) vào Kho chính Hà Nội', '171.252.113.201', DATEADD(HOUR, -3, GETUTCDATE())
     FROM [Users] WHERE email = 'operation@cclearly.com';
+
+-- =============================================
+-- 18. ADDITIONAL CUSTOMER USERS
+-- =============================================
+IF NOT EXISTS (SELECT * FROM [Users] WHERE email = 'customer3@gmail.com')
+    INSERT INTO [Users] (user_id, email, password_hash, full_name, phone_number, role_id, status, is_email_verified, created_at)
+    SELECT NEWID(), 'customer3@gmail.com', '$2a$10$QzSf/hgRoo3mkItxEyUDs.xCgnn7uacO.FDHTEZnNDACHrXhq08SK', N'Nguyễn Văn An', '0987654321', role_id, 'ACTIVE', 1, DATEADD(DAY, -45, GETUTCDATE())
+    FROM [Roles] WHERE role_name = 'CUSTOMER';
+
+IF NOT EXISTS (SELECT * FROM [Users] WHERE email = 'customer4@gmail.com')
+    INSERT INTO [Users] (user_id, email, password_hash, full_name, phone_number, role_id, status, is_email_verified, created_at)
+    SELECT NEWID(), 'customer4@gmail.com', '$2a$10$QzSf/hgRoo3mkItxEyUDs.xCgnn7uacO.FDHTEZnNDACHrXhq08SK', N'Trần Thị Bích', '0976543210', role_id, 'ACTIVE', 1, DATEADD(DAY, -30, GETUTCDATE())
+    FROM [Roles] WHERE role_name = 'CUSTOMER';
+
+IF NOT EXISTS (SELECT * FROM [Users] WHERE email = 'customer5@gmail.com')
+    INSERT INTO [Users] (user_id, email, password_hash, full_name, phone_number, role_id, status, is_email_verified, created_at)
+    SELECT NEWID(), 'customer5@gmail.com', '$2a$10$QzSf/hgRoo3mkItxEyUDs.xCgnn7uacO.FDHTEZnNDACHrXhq08SK', N'Lê Văn Cường', '0965432109', role_id, 'INACTIVE', 0, DATEADD(DAY, -60, GETUTCDATE())
+    FROM [Roles] WHERE role_name = 'CUSTOMER';
+
+-- Customer 3 address
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer3@gmail.com' AND a.name = N'Nguyễn Văn An')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Nguyễn Văn An', '0987654321', N'88 Cầu Giấy, Phường Dịch Vọng, Quận Cầu Giấy', N'Hà Nội', 1
+    FROM [Users] WHERE email = 'customer3@gmail.com';
+
+-- Customer 4 address
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer4@gmail.com' AND a.name = N'Trần Thị Bích')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Trần Thị Bích', '0976543210', N'25 Hai Bà Trưng, Phường Bến Nghé, Quận 1', N'TP. Hồ Chí Minh', 1
+    FROM [Users] WHERE email = 'customer4@gmail.com';
+
+-- Customer 5 address
+IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_id WHERE u.email = 'customer5@gmail.com' AND a.name = N'Lê Văn Cường')
+    INSERT INTO [Addresses] (address_id, user_id, name, phone, street, city, is_default)
+    SELECT NEWID(), user_id, N'Lê Văn Cường', '0965432109', N'102 Nguyễn Huệ, Phường Bến Nghé, Quận 1', N'TP. Hồ Chí Minh', 1
+    FROM [Users] WHERE email = 'customer5@gmail.com';
+
+-- =============================================
+-- 19. ORDERS
+-- =============================================
+-- Order 1: Customer1 - DELIVERED (Ray-Ban Aviator Gold + Essilor lens)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250101')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250101', 'DELIVERED', 6000000, 'VN123456789', DATEADD(DAY, -30, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer1@gmail.com';
+
+-- Order 2: Customer1 - DELIVERED (Oakley + accessory)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250102')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250102', 'DELIVERED', 3050000, 'VN123456790', DATEADD(DAY, -25, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer1@gmail.com';
+
+-- Order 3: Customer1 - SHIPPED (Gucci frame)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250103')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250103', 'SHIPPED', 7500000, 'VN123456791', DATEADD(DAY, -5, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer1@gmail.com';
+
+-- Order 4: Customer2 - DELIVERED (Hoya lens + accessories)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250104')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250104', 'DELIVERED', 2100000, 'VN123456792', DATEADD(DAY, -20, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer2@gmail.com';
+
+-- Order 5: Customer2 - CONFIRMED (Ray-Ban Aviator Silver)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250105')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250105', 'CONFIRMED', 3500000, DATEADD(DAY, -2, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer2@gmail.com';
+
+-- Order 6: Customer3 - DELIVERED (Zeiss lens + Oakley frame)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250106')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250106', 'DELIVERED', 7300000, 'VN123456793', DATEADD(DAY, -15, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer3@gmail.com';
+
+-- Order 7: Customer3 - PENDING (Nikon lens)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250107')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250107', 'PENDING', 2900000, DATEADD(HOUR, -6, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer3@gmail.com';
+
+-- Order 8: Customer4 - DELIVERED (Ray-Ban + Essilor + accessory)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250108')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250108', 'DELIVERED', 6550000, 'VN123456794', DATEADD(DAY, -18, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer4@gmail.com';
+
+-- Order 9: Customer4 - CANCELLED (Rodenstock lens)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250109')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250109', 'CANCELLED', 5500000, DATEADD(DAY, -10, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer4@gmail.com';
+
+-- Order 10: Customer1 - RETURN_REQUESTED (Oakley Holbrook - tortoise)
+IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250110')
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250110', 'RETURN_REQUESTED', 2900000, 'VN123456795', DATEADD(DAY, -8, GETUTCDATE()),
+           (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
+    FROM [Users] u WHERE u.email = 'customer1@gmail.com';
+
+-- =============================================
+-- 20. ORDER ITEMS (each row = 1 unit, no quantity column)
+-- =============================================
+-- ORD-20250101: Ray-Ban Aviator Gold (3,500,000) + Essilor 1.56 (2,500,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250101' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'RB-AV-GOLD'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 3500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250101' AND v.sku = 'RB-AV-GOLD';
+
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250101' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'ESS-CS-1.56'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250101' AND v.sku = 'ESS-CS-1.56';
+
+-- ORD-20250102: Oakley Holbrook Black (2,800,000) + Hộp kính (250,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250102' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'OAK-HB-BLACK'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2800000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250102' AND v.sku = 'OAK-HB-BLACK';
+
+-- ORD-20250103: Gucci GG0061S (7,500,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250103' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'GG-0061-BLACK'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 7500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250103' AND v.sku = 'GG-0061-BLACK';
+
+-- ORD-20250104: Hoya Blue Control 1.56 (1,800,000) + Khăn lau (50,000) + Dung dịch (120,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250104' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'HY-BC-1.56'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 1800000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250104' AND v.sku = 'HY-BC-1.56';
+
+-- ORD-20250105: Ray-Ban Aviator Silver (3,500,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250105' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'RB-AV-SILVER'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 3500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250105' AND v.sku = 'RB-AV-SILVER';
+
+-- ORD-20250106: Zeiss Digital Lens 1.6 (4,500,000) + Oakley Holbrook Black (2,800,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250106' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'ZS-DL-1.6'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 4500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250106' AND v.sku = 'ZS-DL-1.6';
+
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250106' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'OAK-HB-BLACK'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2800000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250106' AND v.sku = 'OAK-HB-BLACK';
+
+-- ORD-20250107: Nikon Lite AS 1.6 (2,900,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250107' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'NK-LA-1.6'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2900000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250107' AND v.sku = 'NK-LA-1.6';
+
+-- ORD-20250108: Ray-Ban Aviator Black (3,700,000) + Essilor 1.6 (3,200,000) combo => sale off a bit = 6,550,000 total
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250108' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'RB-AV-BLACK'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 3700000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250108' AND v.sku = 'RB-AV-BLACK';
+
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250108' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'ESS-CS-1.6'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2850000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250108' AND v.sku = 'ESS-CS-1.6';
+
+-- ORD-20250109: Rodenstock Multigressiv 1.6 (5,500,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250109' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'RD-MG-1.6'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 5500000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250109' AND v.sku = 'RD-MG-1.6';
+
+-- ORD-20250110: Oakley Holbrook Tortoise (2,900,000)
+IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'ORD-20250110' AND oi.variant_id = (SELECT variant_id FROM [Product_Variants] WHERE sku = 'OAK-HB-TORT'))
+    INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
+    SELECT NEWID(), o.order_id, v.variant_id, 2900000
+    FROM [Orders] o, [Product_Variants] v WHERE o.code = 'ORD-20250110' AND v.sku = 'OAK-HB-TORT';
+
+-- =============================================
+-- 21. PAYMENTS
+-- =============================================
+-- ORD-20250101: COD - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250101')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250101';
+
+-- ORD-20250102: BANK_TRANSFER - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250102')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250102';
+
+-- ORD-20250103: PAYOS - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250103')
+    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250103-001' FROM [Orders] WHERE code = 'ORD-20250103';
+
+-- ORD-20250104: COD - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250104')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250104';
+
+-- ORD-20250105: PAYOS - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250105')
+    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250105-001' FROM [Orders] WHERE code = 'ORD-20250105';
+
+-- ORD-20250106: BANK_TRANSFER - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250106')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250106';
+
+-- ORD-20250107: COD - PENDING (order is still pending)
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250107')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250107';
+
+-- ORD-20250108: PAYOS - COMPLETED
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250108')
+    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250108-001' FROM [Orders] WHERE code = 'ORD-20250108';
+
+-- ORD-20250109: PAYOS - REFUNDED (cancelled order)
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250109')
+    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 'REFUNDED', 'PAYOS-20250109-001' FROM [Orders] WHERE code = 'ORD-20250109';
+
+-- ORD-20250110: COD - COMPLETED (return requested after delivery)
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250110')
+    INSERT INTO [Payments] (payment_id, order_id, method, status)
+    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250110';
+
+-- =============================================
+-- 22. REFUNDS
+-- =============================================
+-- Refund 1: ORD-20250110 - PENDING return request (Oakley Holbrook bị trầy kính)
+IF NOT EXISTS (SELECT * FROM [Refunds] r JOIN [Orders] o ON r.order_id = o.order_id WHERE o.code = 'ORD-20250110' AND r.status = 'PENDING')
+    INSERT INTO [Refunds] (refund_id, order_id, amount, reason, status, created_at)
+    SELECT NEWID(), order_id, 2900000, N'Sản phẩm bị trầy xước mặt kính khi nhận hàng. Yêu cầu đổi trả.', 'PENDING', DATEADD(DAY, -3, GETUTCDATE())
+    FROM [Orders] WHERE code = 'ORD-20250110';
+
+-- Refund 2: ORD-20250109 - COMPLETED refund (customer cancelled, money returned)
+IF NOT EXISTS (SELECT * FROM [Refunds] r JOIN [Orders] o ON r.order_id = o.order_id WHERE o.code = 'ORD-20250109' AND r.status = 'COMPLETED')
+    INSERT INTO [Refunds] (refund_id, order_id, amount, reason, status, created_at)
+    SELECT NEWID(), order_id, 5500000, N'Khách hàng hủy đơn trước khi giao hàng. Hoàn tiền đầy đủ qua PayOS.', 'COMPLETED', DATEADD(DAY, -9, GETUTCDATE())
+    FROM [Orders] WHERE code = 'ORD-20250109';
+
+-- Refund 3: ORD-20250104 - APPROVED (partial refund for wrong lens specification)
+IF NOT EXISTS (SELECT * FROM [Refunds] r JOIN [Orders] o ON r.order_id = o.order_id WHERE o.code = 'ORD-20250104' AND r.status = 'APPROVED')
+    INSERT INTO [Refunds] (refund_id, order_id, amount, reason, status, created_at)
+    SELECT NEWID(), order_id, 500000, N'Tròng kính giao không đúng độ theo đơn. Hoàn tiền chênh lệch 500,000 VNĐ.', 'APPROVED', DATEADD(DAY, -12, GETUTCDATE())
+    FROM [Orders] WHERE code = 'ORD-20250104';
+
+-- =============================================
+-- 23. ORDER STATUS LOGS
+-- =============================================
+-- ORD-20250101 status history: PENDING -> CONFIRMED -> SHIPPED -> DELIVERED
+IF NOT EXISTS (SELECT * FROM [Order_Status_Logs] osl JOIN [Orders] o ON osl.order_id = o.order_id WHERE o.code = 'ORD-20250101' AND osl.new_status = 'CONFIRMED')
+    INSERT INTO [Order_Status_Logs] (log_id, order_id, user_id, new_status, note)
+    SELECT NEWID(), o.order_id, u.user_id, 'CONFIRMED', N'Xác nhận đơn hàng'
+    FROM [Orders] o, [Users] u WHERE o.code = 'ORD-20250101' AND u.email = 'sales@cclearly.com';
+
+IF NOT EXISTS (SELECT * FROM [Order_Status_Logs] osl JOIN [Orders] o ON osl.order_id = o.order_id WHERE o.code = 'ORD-20250101' AND osl.new_status = 'SHIPPED')
+    INSERT INTO [Order_Status_Logs] (log_id, order_id, user_id, new_status, note)
+    SELECT NEWID(), o.order_id, u.user_id, 'SHIPPED', N'Đã giao cho đơn vị vận chuyển'
+    FROM [Orders] o, [Users] u WHERE o.code = 'ORD-20250101' AND u.email = 'operation@cclearly.com';
+
+IF NOT EXISTS (SELECT * FROM [Order_Status_Logs] osl JOIN [Orders] o ON osl.order_id = o.order_id WHERE o.code = 'ORD-20250101' AND osl.new_status = 'DELIVERED')
+    INSERT INTO [Order_Status_Logs] (log_id, order_id, user_id, new_status, note)
+    SELECT NEWID(), o.order_id, u.user_id, 'DELIVERED', N'Khách hàng đã nhận hàng'
+    FROM [Orders] o, [Users] u WHERE o.code = 'ORD-20250101' AND u.email = 'operation@cclearly.com';
+
+-- ORD-20250109 status history: PENDING -> CANCELLED
+IF NOT EXISTS (SELECT * FROM [Order_Status_Logs] osl JOIN [Orders] o ON osl.order_id = o.order_id WHERE o.code = 'ORD-20250109' AND osl.new_status = 'CANCELLED')
+    INSERT INTO [Order_Status_Logs] (log_id, order_id, user_id, new_status, note)
+    SELECT NEWID(), o.order_id, u.user_id, 'CANCELLED', N'Khách yêu cầu hủy đơn'
+    FROM [Orders] o, [Users] u WHERE o.code = 'ORD-20250109' AND u.email = 'sales@cclearly.com';
+
+-- ORD-20250110 status history: PENDING -> CONFIRMED -> SHIPPED -> DELIVERED -> RETURN_REQUESTED
+IF NOT EXISTS (SELECT * FROM [Order_Status_Logs] osl JOIN [Orders] o ON osl.order_id = o.order_id WHERE o.code = 'ORD-20250110' AND osl.new_status = 'RETURN_REQUESTED')
+    INSERT INTO [Order_Status_Logs] (log_id, order_id, user_id, new_status, note)
+    SELECT NEWID(), o.order_id, u.user_id, 'RETURN_REQUESTED', N'Khách hàng yêu cầu trả hàng - sản phẩm bị trầy xước'
+    FROM [Orders] o, [Users] u WHERE o.code = 'ORD-20250110' AND u.email = 'customer1@gmail.com';

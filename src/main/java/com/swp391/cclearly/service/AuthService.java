@@ -296,7 +296,7 @@ public class AuthService {
   private AuthResponse generateAuthResponse(User user) {
     String accessToken =
         jwtService.generateToken(
-            user.getEmail(), user.getRole().getRoleName(), user.getUserId());
+            user.getEmail(), user.getRole().getRoleName(), user.getUserId(), user.getFullName());
 
     String refreshToken =
         jwtService.generateRefreshToken(user.getEmail(), user.getUserId());

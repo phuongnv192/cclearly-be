@@ -320,10 +320,12 @@ public class OrderService {
 
     return OrderResponse.builder()
         .orderId(o.getOrderId())
+        .userId(o.getUser() != null ? o.getUser().getUserId() : null)
         .code(o.getCode())
         .status(o.getStatus())
         .type(type)
         .finalAmount(o.getFinalAmount())
+        .customerEmail(o.getUser() != null ? o.getUser().getEmail() : null)
         .trackingNumber(o.getTrackingNumber())
         .shippingStreet(o.getAddress() != null ? o.getAddress().getStreet() : null)
         .shippingCity(o.getAddress() != null ? o.getAddress().getCity() : null)

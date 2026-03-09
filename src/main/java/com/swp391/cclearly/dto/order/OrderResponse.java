@@ -11,10 +11,12 @@ import lombok.Data;
 @Builder
 public class OrderResponse {
   private UUID orderId;
+  private UUID userId;
   private String code;
   private String status;
   private String type; // regular, prescription
   private BigDecimal finalAmount;
+  private String customerEmail;
   private String shippingStreet;
   private String shippingCity;
   private String shippingPhone;

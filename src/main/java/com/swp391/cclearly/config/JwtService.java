@@ -43,10 +43,11 @@ public class JwtService {
   /**
    * Generate JWT token with user info and role
    */
-  public String generateToken(String email, String role, UUID userId) {
+  public String generateToken(String email, String role, UUID userId, String fullName) {
     Map<String, Object> claims = new HashMap<>();
     claims.put("role", role);
     claims.put("userId", userId.toString());
+    claims.put("fullName", fullName != null ? fullName : "");
 
     return Jwts.builder()
         .claims(claims)

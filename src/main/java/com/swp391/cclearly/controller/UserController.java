@@ -2,6 +2,7 @@ package com.swp391.cclearly.controller;
 
 import com.swp391.cclearly.dto.address.AddressRequest;
 import com.swp391.cclearly.dto.address.AddressResponse;
+import com.swp391.cclearly.dto.admin.AdminUserResponse;
 import com.swp391.cclearly.dto.base.ApiResponse;
 import com.swp391.cclearly.dto.order.OrderResponse;
 import com.swp391.cclearly.dto.order.ReturnRequest;
@@ -32,6 +33,12 @@ public class UserController {
   private final UserService userService;
   private final OrderService orderService;
   private final AddressService addressService;
+
+  @Operation(summary = "Lấy danh sách khách hàng")
+  @GetMapping("/customers")
+  public ResponseEntity<ApiResponse<List<AdminUserResponse>>> getCustomers() {
+    return ResponseEntity.ok(userService.getCustomers());
+  }
 
   @Operation(summary = "Lấy thông tin cá nhân")
   @GetMapping("/profile")
