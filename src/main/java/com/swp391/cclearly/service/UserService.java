@@ -21,18 +21,22 @@ public class UserService {
 
   @Transactional(readOnly = true)
   public ApiResponse<UserProfileResponse> getProfile(User user) {
-    return ApiResponse.success("Lấy thông tin thành công", toResponse(user));
+    User managed = userRepository.findByIdWithRole(user.getUserId())
+        .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+    return ApiResponse.success("Lấy thông tin thành công", toResponse(managed));
   }
 
   public ApiResponse<UserProfileResponse> updateProfile(User user, UpdateProfileRequest request) {
+    User managed = userRepository.findByIdWithRole(user.getUserId())
+        .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
     if (request.getFullName() != null && !request.getFullName().isBlank()) {
-      user.setFullName(request.getFullName());
+      managed.setFullName(request.getFullName());
     }
     if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
-      user.setPhoneNumber(request.getPhoneNumber());
+      managed.setPhoneNumber(request.getPhoneNumber());
     }
-    userRepository.save(user);
-    return ApiResponse.success("Cập nhật thông tin thành công", toResponse(user));
+    userRepository.save(managed);
+    return ApiResponse.success("Cập nhật thông tin thành công", toResponse(managed));
   }
 
   @Transactional(readOnly = true)
