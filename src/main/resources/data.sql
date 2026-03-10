@@ -935,71 +935,71 @@ IF NOT EXISTS (SELECT * FROM [Addresses] a JOIN [Users] u ON a.user_id = u.user_
 -- =============================================
 -- Order 1: Customer1 - DELIVERED (Ray-Ban Aviator Gold + Essilor lens)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250101')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250101', 'DELIVERED', 6000000, 'VN123456789', DATEADD(DAY, -30, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250101', 'DELIVERED', 6000000, 0, 'VN123456789', DATEADD(DAY, -30, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer1@gmail.com';
 
 -- Order 2: Customer1 - DELIVERED (Oakley + accessory)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250102')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250102', 'DELIVERED', 3050000, 'VN123456790', DATEADD(DAY, -25, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250102', 'DELIVERED', 3050000, 0, 'VN123456790', DATEADD(DAY, -25, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer1@gmail.com';
 
 -- Order 3: Customer1 - SHIPPED (Gucci frame)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250103')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250103', 'SHIPPED', 7500000, 'VN123456791', DATEADD(DAY, -5, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250103', 'SHIPPED', 7500000, 0, 'VN123456791', DATEADD(DAY, -5, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer1@gmail.com';
 
 -- Order 4: Customer2 - DELIVERED (Hoya lens + accessories)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250104')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250104', 'DELIVERED', 2100000, 'VN123456792', DATEADD(DAY, -20, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250104', 'DELIVERED', 2100000, 0, 'VN123456792', DATEADD(DAY, -20, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer2@gmail.com';
 
 -- Order 5: Customer2 - CONFIRMED (Ray-Ban Aviator Silver)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250105')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250105', 'CONFIRMED', 3500000, DATEADD(DAY, -2, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250105', 'CONFIRMED', 3500000, 0, DATEADD(DAY, -2, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer2@gmail.com';
 
 -- Order 6: Customer3 - DELIVERED (Zeiss lens + Oakley frame)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250106')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250106', 'DELIVERED', 7300000, 'VN123456793', DATEADD(DAY, -15, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250106', 'DELIVERED', 7300000, 0, 'VN123456793', DATEADD(DAY, -15, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer3@gmail.com';
 
 -- Order 7: Customer3 - PENDING (Nikon lens)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250107')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250107', 'PENDING', 2900000, DATEADD(HOUR, -6, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250107', 'PENDING', 2900000, 0, DATEADD(HOUR, -6, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer3@gmail.com';
 
 -- Order 8: Customer4 - DELIVERED (Ray-Ban + Essilor + accessory)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250108')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250108', 'DELIVERED', 6550000, 'VN123456794', DATEADD(DAY, -18, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250108', 'DELIVERED', 6550000, 0, 'VN123456794', DATEADD(DAY, -18, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer4@gmail.com';
 
 -- Order 9: Customer4 - CANCELLED (Rodenstock lens)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250109')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250109', 'CANCELLED', 5500000, DATEADD(DAY, -10, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250109', 'CANCELLED', 5500000, 0, DATEADD(DAY, -10, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer4@gmail.com';
 
 -- Order 10: Customer1 - RETURN_REQUESTED (Oakley Holbrook - tortoise)
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'ORD-20250110')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, tracking_number, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'ORD-20250110', 'RETURN_REQUESTED', 2900000, 'VN123456795', DATEADD(DAY, -8, GETUTCDATE()),
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, tracking_number, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'ORD-20250110', 'RETURN_REQUESTED', 2900000, 0, 'VN123456795', DATEADD(DAY, -8, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer1@gmail.com';
 
@@ -1086,53 +1086,53 @@ IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o
 -- =============================================
 -- ORD-20250101: COD - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250101')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250101';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 6000000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250101';
 
 -- ORD-20250102: BANK_TRANSFER - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250102')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250102';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 3050000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250102';
 
 -- ORD-20250103: PAYOS - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250103')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250103-001' FROM [Orders] WHERE code = 'ORD-20250103';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 7500000, 'COMPLETED', 'PAYOS-20250103-001' FROM [Orders] WHERE code = 'ORD-20250103';
 
 -- ORD-20250104: COD - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250104')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250104';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 2100000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250104';
 
 -- ORD-20250105: PAYOS - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250105')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250105-001' FROM [Orders] WHERE code = 'ORD-20250105';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 3500000, 'COMPLETED', 'PAYOS-20250105-001' FROM [Orders] WHERE code = 'ORD-20250105';
 
 -- ORD-20250106: BANK_TRANSFER - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250106')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250106';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 7300000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250106';
 
 -- ORD-20250107: COD - PENDING (order is still pending)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250107')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250107';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 2900000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250107';
 
 -- ORD-20250108: PAYOS - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250108')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250108-001' FROM [Orders] WHERE code = 'ORD-20250108';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 6550000, 'COMPLETED', 'PAYOS-20250108-001' FROM [Orders] WHERE code = 'ORD-20250108';
 
 -- ORD-20250109: PAYOS - REFUNDED (cancelled order)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250109')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'REFUNDED', 'PAYOS-20250109-001' FROM [Orders] WHERE code = 'ORD-20250109';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 5500000, 'REFUNDED', 'PAYOS-20250109-001' FROM [Orders] WHERE code = 'ORD-20250109';
 
 -- ORD-20250110: COD - COMPLETED (return requested after delivery)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250110')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250110';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 2900000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250110';
 
 -- =============================================
 -- 22. REFUNDS
@@ -1496,68 +1496,68 @@ IF NOT EXISTS (SELECT * FROM [Prescriptions] p JOIN [Order_Items] oi ON p.order_
 
 -- ORD-20250201: COD - PENDING (order still PENDING)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250201')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250201';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 8200000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250201';
 
 -- ORD-20250202: BANK_TRANSFER - PENDING
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250202')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250202';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 2800000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250202';
 
 -- ORD-20250203: PAYOS - COMPLETED (prepaid)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250203')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250203-001' FROM [Orders] WHERE code = 'ORD-20250203';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 13500000, 'COMPLETED', 'PAYOS-20250203-001' FROM [Orders] WHERE code = 'ORD-20250203';
 
 -- ORD-20250204: COD - PENDING
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250204')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250204';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 3500000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250204';
 
 -- ORD-20250205: PAYOS - COMPLETED (prepaid)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250205')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250205-001' FROM [Orders] WHERE code = 'ORD-20250205';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 5400000, 'COMPLETED', 'PAYOS-20250205-001' FROM [Orders] WHERE code = 'ORD-20250205';
 
 -- ORD-20250206: BANK_TRANSFER - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250206')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250206';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 6400000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250206';
 
 -- ORD-20250207: COD - PENDING (will pay on delivery)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250207')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250207';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 3500000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250207';
 
 -- ORD-20250208: PAYOS - COMPLETED (prepaid)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250208')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250208-001' FROM [Orders] WHERE code = 'ORD-20250208';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 2800000, 'COMPLETED', 'PAYOS-20250208-001' FROM [Orders] WHERE code = 'ORD-20250208';
 
 -- ORD-20250209: COD - PENDING (will pay on delivery)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250209')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'PENDING' FROM [Orders] WHERE code = 'ORD-20250209';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 10500000, 'PENDING' FROM [Orders] WHERE code = 'ORD-20250209';
 
 -- ORD-20250210: BANK_TRANSFER - COMPLETED
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250210')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250210';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 14700000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250210';
 
 -- ORD-20250211: COD - COMPLETED (was delivered then return requested)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250211')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'COD', 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250211';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 5500000, 'COMPLETED' FROM [Orders] WHERE code = 'ORD-20250211';
 
 -- ORD-20250212: BANK_TRANSFER - REFUNDED (returned and refunded)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250212')
-    INSERT INTO [Payments] (payment_id, order_id, method, status)
-    SELECT NEWID(), order_id, 'BANK_TRANSFER', 'REFUNDED' FROM [Orders] WHERE code = 'ORD-20250212';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'BANK_TRANSFER', 6400000, 'REFUNDED' FROM [Orders] WHERE code = 'ORD-20250212';
 
 -- ORD-20250213: PAYOS - COMPLETED (prepaid)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250213')
-    INSERT INTO [Payments] (payment_id, order_id, method, status, payos_order_code)
-    SELECT NEWID(), order_id, 'PAYOS', 'COMPLETED', 'PAYOS-20250213-001' FROM [Orders] WHERE code = 'ORD-20250213';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 3500000, 'COMPLETED', 'PAYOS-20250213-001' FROM [Orders] WHERE code = 'ORD-20250213';
 
 -- ORD-20250214: COD - COMPLETED (paid on delivery, now shipped)
 IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'ORD-20250214')
@@ -1828,23 +1828,23 @@ WHERE sku = 'OAK-HB-TORT';
 -- =============================================
 -- 26. PRE-ORDER ORDERS
 -- =============================================
--- Preorder 1: Customer2 - CONFIRMED (waiting for Gucci GG0061S to arrive), deposit 50%
+-- Preorder 1: Customer2 - CONFIRMED (waiting for Gucci GG0061S to arrive), deposit 50% = 3,750,000₫
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'PRE-20250201')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, is_preorder, preorder_deadline, payment_type, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'PRE-20250201', 'CONFIRMED', 3750000, 1, DATEADD(DAY, 3, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, is_preorder, preorder_deadline, payment_type, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'PRE-20250201', 'CONFIRMED', 7500000, 0, 1, DATEADD(DAY, 3, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
            DATEADD(DAY, -4, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer2@gmail.com';
 
 IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'PRE-20250201')
     INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
-    SELECT NEWID(), o.order_id, pv.variant_id, 3750000
+    SELECT NEWID(), o.order_id, pv.variant_id, 7500000
     FROM [Orders] o, [Product_Variants] pv WHERE o.code = 'PRE-20250201' AND pv.sku = 'GG-0061-BLACK';
 
--- Preorder 2: Customer3 - PENDING (Oakley Holbrook Tortoise), overdue, full payment
+-- Preorder 2: Customer3 - PENDING (Oakley Holbrook Tortoise), overdue, deposit 50% = 1,450,000₫
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'PRE-20250202')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, is_preorder, preorder_deadline, payment_type, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'PRE-20250202', 'PENDING', 2900000, 1, DATEADD(DAY, -2, CAST(GETUTCDATE() AS DATE)), 'FULL',
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, is_preorder, preorder_deadline, payment_type, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'PRE-20250202', 'PENDING', 2900000, 0, 1, DATEADD(DAY, -2, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
            DATEADD(DAY, -9, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer3@gmail.com';
@@ -1854,23 +1854,23 @@ IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o
     SELECT NEWID(), o.order_id, pv.variant_id, 2900000
     FROM [Orders] o, [Product_Variants] pv WHERE o.code = 'PRE-20250202' AND pv.sku = 'OAK-HB-TORT';
 
--- Preorder 3: Customer4 - CONFIRMED (Gucci), deposit 50%
+-- Preorder 3: Customer4 - CONFIRMED (Gucci), deposit 50% = 3,750,000₫
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'PRE-20250203')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, is_preorder, preorder_deadline, payment_type, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'PRE-20250203', 'CONFIRMED', 3750000, 1, DATEADD(DAY, 5, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, is_preorder, preorder_deadline, payment_type, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'PRE-20250203', 'CONFIRMED', 7500000, 0, 1, DATEADD(DAY, 5, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
            DATEADD(DAY, -2, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer4@gmail.com';
 
 IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o.order_id WHERE o.code = 'PRE-20250203')
     INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
-    SELECT NEWID(), o.order_id, pv.variant_id, 3750000
+    SELECT NEWID(), o.order_id, pv.variant_id, 7500000
     FROM [Orders] o, [Product_Variants] pv WHERE o.code = 'PRE-20250203' AND pv.sku = 'GG-0061-BLACK';
 
--- Preorder 4: Customer5 - PROCESSING (already received stock, being processed)
+-- Preorder 4: Customer5 - PROCESSING (already received stock, being processed), deposit 50% = 1,450,000₫
 IF NOT EXISTS (SELECT * FROM [Orders] WHERE code = 'PRE-20250204')
-    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, is_preorder, preorder_deadline, payment_type, created_at, address_id)
-    SELECT NEWID(), u.user_id, 'PRE-20250204', 'PROCESSING', 2900000, 1, DATEADD(DAY, -1, CAST(GETUTCDATE() AS DATE)), 'FULL',
+    INSERT INTO [Orders] (order_id, user_id, code, status, final_amount, shipping_fee, is_preorder, preorder_deadline, payment_type, created_at, address_id)
+    SELECT NEWID(), u.user_id, 'PRE-20250204', 'PROCESSING', 2900000, 0, 1, DATEADD(DAY, -1, CAST(GETUTCDATE() AS DATE)), 'DEPOSIT',
            DATEADD(DAY, -8, GETUTCDATE()),
            (SELECT TOP 1 address_id FROM [Addresses] WHERE user_id = u.user_id AND is_default = 1)
     FROM [Users] u WHERE u.email = 'customer5@gmail.com';
@@ -1879,3 +1879,42 @@ IF NOT EXISTS (SELECT * FROM [Order_Items] oi JOIN [Orders] o ON oi.order_id = o
     INSERT INTO [Order_Items] (order_item_id, order_id, variant_id, unit_price)
     SELECT NEWID(), o.order_id, pv.variant_id, 2900000
     FROM [Orders] o, [Product_Variants] pv WHERE o.code = 'PRE-20250204' AND pv.sku = 'OAK-HB-TORT';
+
+-- =============================================
+-- 27. PRE-ORDER PAYMENTS (split: PAYOS deposit 50% + COD remainder)
+-- =============================================
+-- PRE-20250201: PAYOS deposit 3,750,000₫ (50% of 7,500,000₫) + COD 3,750,000₫
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'PRE-20250201')
+BEGIN
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 3750000, 'COMPLETED', 'PAYOS-PRE20250201' FROM [Orders] WHERE code = 'PRE-20250201';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 3750000, 'PENDING' FROM [Orders] WHERE code = 'PRE-20250201';
+END
+
+-- PRE-20250202: PAYOS deposit 1,450,000₫ (50% of 2,900,000₫) + COD 1,450,000₫
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'PRE-20250202')
+BEGIN
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 1450000, 'COMPLETED', 'PAYOS-PRE20250202' FROM [Orders] WHERE code = 'PRE-20250202';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 1450000, 'PENDING' FROM [Orders] WHERE code = 'PRE-20250202';
+END
+
+-- PRE-20250203: PAYOS deposit 3,750,000₫ (50% of 7,500,000₫) + COD 3,750,000₫
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'PRE-20250203')
+BEGIN
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 3750000, 'COMPLETED', 'PAYOS-PRE20250203' FROM [Orders] WHERE code = 'PRE-20250203';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 3750000, 'PENDING' FROM [Orders] WHERE code = 'PRE-20250203';
+END
+
+-- PRE-20250204: PAYOS deposit 1,450,000₫ (50% of 2,900,000₫) + COD 1,450,000₫
+IF NOT EXISTS (SELECT * FROM [Payments] p JOIN [Orders] o ON p.order_id = o.order_id WHERE o.code = 'PRE-20250204')
+BEGIN
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status, payos_order_code)
+    SELECT NEWID(), order_id, 'PAYOS', 1450000, 'COMPLETED', 'PAYOS-PRE20250204' FROM [Orders] WHERE code = 'PRE-20250204';
+    INSERT INTO [Payments] (payment_id, order_id, method, amount, status)
+    SELECT NEWID(), order_id, 'COD', 1450000, 'PENDING' FROM [Orders] WHERE code = 'PRE-20250204';
+END
