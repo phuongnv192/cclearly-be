@@ -81,9 +81,22 @@ public class OrderService {
     if (request.getAddressId() != null) {
       address = addressRepository.findById(request.getAddressId())
           .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy địa chỉ"));
+      // Ensure the address belongs to this user
+      if (!address.getUser().getUserId().equals(user.getUserId())) {
+        throw new BadRequestException("Địa chỉ không hợp lệ");
+      }
     } else {
+      // Validate required fields when not using saved address
+      if (request.getStreet() == null || request.getStreet().isBlank()) {
+        throw new BadRequestException("Địa chỉ không được để trống");
+      }
+      if (request.getPhone() == null || request.getPhone().isBlank()) {
+        throw new BadRequestException("Số điện thoại không được để trống");
+      }
       address = Address.builder()
           .user(user)
+          .name(request.getRecipientName())
+          .phone(request.getPhone())
           .street(request.getStreet())
           .city(request.getCity())
           .isDefault(false)
@@ -152,28 +165,14 @@ public class OrderService {
 
     // Create Payment records
     if (hasPreorder) {
-      // Preorder: deposit = 50% of preorder items' value, paid via PAYOS
-      BigDecimal depositAmount = preorderTotal.multiply(new BigDecimal("0.5"));
-      BigDecimal codRemainder = total.subtract(depositAmount);
-
-      Payment depositPayment = Payment.builder()
+      // Preorder: full COD payment (online payment gateway not yet available)
+      Payment codPayment = Payment.builder()
           .order(order)
-          .method("PAYOS")
-          .amount(depositAmount)
-          .status("COMPLETED")
-          .payosOrderCode("PAYOS-" + orderCode)
+          .method("COD")
+          .amount(order.getFinalAmount())
+          .status("PENDING")
           .build();
-      order.getPayments().add(depositPayment);
-
-      if (codRemainder.compareTo(BigDecimal.ZERO) > 0) {
-        Payment codPayment = Payment.builder()
-            .order(order)
-            .method("COD")
-            .amount(codRemainder)
-            .status("PENDING")
-            .build();
-        order.getPayments().add(codPayment);
-      }
+      order.getPayments().add(codPayment);
     } else {
       // Non-preorder: single payment
       String method = request.getPaymentMethod() != null
