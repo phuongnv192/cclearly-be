@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,9 +69,13 @@ public class AdminService {
     long cancelledOrders = orderRepository.countByStatus("CANCELLED");
 
     // Total revenue from delivered orders
+    ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
     List<Order> allOrders = orderRepository.findAll();
-    BigDecimal totalRevenue = allOrders.stream()
+    List<Order> deliveredOrderList = allOrders.stream()
         .filter(o -> "DELIVERED".equals(o.getStatus()))
+        .collect(Collectors.toList());
+
+    BigDecimal totalRevenue = deliveredOrderList.stream()
         .map(Order::getFinalAmount)
         .filter(a -> a != null)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -82,6 +87,62 @@ public class AdminService {
     ordersByStatus.put("DELIVERED", deliveredOrders);
     ordersByStatus.put("CANCELLED", cancelledOrders);
 
+    // Revenue by month (last 6 months)
+    YearMonth currentMonth = YearMonth.now(zoneId);
+    List<DashboardStatsResponse.RevenueByMonth> revenueByMonth = new ArrayList<>();
+    for (int i = 5; i >= 0; i--) {
+      YearMonth ym = currentMonth.minusMonths(i);
+      String monthLabel = String.valueOf(ym.getMonthValue());
+      BigDecimal monthRevenue = BigDecimal.ZERO;
+      long monthOrders = 0;
+      for (Order o : deliveredOrderList) {
+        if (o.getCreatedAt() != null) {
+          YearMonth orderYm = YearMonth.from(o.getCreatedAt().atZone(zoneId));
+          if (orderYm.equals(ym)) {
+            monthRevenue = monthRevenue.add(
+                o.getFinalAmount() != null ? o.getFinalAmount() : BigDecimal.ZERO);
+            monthOrders++;
+          }
+        }
+      }
+      revenueByMonth.add(DashboardStatsResponse.RevenueByMonth.builder()
+          .month(monthLabel)
+          .revenue(monthRevenue)
+          .orders(monthOrders)
+          .build());
+    }
+
+    // Top products (from delivered order items)
+    Map<UUID, String> productNames = new HashMap<>();
+    Map<UUID, String> productTypes = new HashMap<>();
+    Map<UUID, Long> productSold = new HashMap<>();
+    Map<UUID, BigDecimal> productRevenue = new HashMap<>();
+    for (Order o : deliveredOrderList) {
+      if (o.getOrderItems() != null) {
+        for (var item : o.getOrderItems()) {
+          if (item.getVariant() != null && item.getVariant().getProduct() != null) {
+            UUID productId = item.getVariant().getProduct().getProductId();
+            productNames.putIfAbsent(productId, item.getVariant().getProduct().getName());
+            productTypes.putIfAbsent(productId, item.getVariant().getProduct().getCategoryType());
+            productSold.merge(productId, 1L, Long::sum);
+            productRevenue.merge(productId,
+                item.getUnitPrice() != null ? item.getUnitPrice() : BigDecimal.ZERO,
+                BigDecimal::add);
+          }
+        }
+      }
+    }
+    List<DashboardStatsResponse.TopProduct> topProducts = productSold.entrySet().stream()
+        .sorted(Map.Entry.<UUID, Long>comparingByValue().reversed())
+        .limit(5)
+        .map(e -> DashboardStatsResponse.TopProduct.builder()
+            .name(productNames.get(e.getKey()))
+            .type(productTypes.get(e.getKey()))
+            .sold(e.getValue())
+            .revenue(productRevenue.get(e.getKey()))
+            .build())
+        .collect(Collectors.toList());
+
     DashboardStatsResponse stats = DashboardStatsResponse.builder()
         .totalOrders(totalOrders)
         .totalCustomers(totalCustomers)
@@ -92,8 +153,8 @@ public class AdminService {
         .deliveredOrders(deliveredOrders)
         .cancelledOrders(cancelledOrders)
         .ordersByStatus(ordersByStatus)
-        .revenueByMonth(new ArrayList<>())
-        .topProducts(new ArrayList<>())
+        .revenueByMonth(revenueByMonth)
+        .topProducts(topProducts)
         .build();
 
     return ApiResponse.success("Lấy thống kê dashboard thành công", stats);
