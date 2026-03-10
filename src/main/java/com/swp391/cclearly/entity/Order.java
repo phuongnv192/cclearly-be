@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "Orders")
@@ -43,7 +44,8 @@ public class Order {
   @Column(name = "tracking_number", length = 100)
   private String trackingNumber;
 
-  @Column(name = "created_at")
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
   private Instant createdAt;
 
   @Column(name = "is_preorder")
@@ -63,9 +65,11 @@ public class Order {
   private Address address;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  @Builder.Default
   private Set<OrderItem> orderItems = new HashSet<>();
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  @Builder.Default
   private Set<Payment> payments = new HashSet<>();
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
