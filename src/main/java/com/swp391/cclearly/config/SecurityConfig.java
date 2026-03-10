@@ -66,7 +66,12 @@ public class SecurityConfig {
                 "/api/categories/**"
             ).permitAll()
 
-            // 🔒 Admin only endpoints
+            // 🔒 Admin endpoints shared with Manager (dashboard, revenue, users)
+            .requestMatchers("/api/admin/dashboard/**").hasAnyRole("ADMIN", "MANAGER")
+            .requestMatchers("/api/admin/revenue/**").hasAnyRole("ADMIN", "MANAGER")
+            .requestMatchers("/api/admin/users/**").hasAnyRole("ADMIN", "MANAGER")
+
+            // 🔒 Admin only endpoints (settings, logs, etc.)
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
             // 🔒 Manager endpoints
