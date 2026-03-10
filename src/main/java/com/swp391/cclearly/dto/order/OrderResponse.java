@@ -17,6 +17,7 @@ public class OrderResponse {
   private String status;
   private String type; // regular, prescription
   private BigDecimal finalAmount;
+  private BigDecimal shippingFee;
   private String customerEmail;
   private String shippingStreet;
   private String shippingCity;
@@ -25,6 +26,8 @@ public class OrderResponse {
   private String trackingNumber;
   private String notes;
   private String paymentMethod;
+  private BigDecimal paidAmount;   // sum of COMPLETED payments
+  private BigDecimal codAmount;    // finalAmount - paidAmount (amount to collect on delivery)
   private Boolean isPreorder;
   private LocalDate preorderDeadline;
   private String paymentType; // DEPOSIT or FULL

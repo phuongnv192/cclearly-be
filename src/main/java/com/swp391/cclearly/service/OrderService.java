@@ -23,6 +23,7 @@ import com.swp391.cclearly.repository.CartRepository;
 import com.swp391.cclearly.repository.OrderItemRepository;
 import com.swp391.cclearly.repository.OrderRepository;
 import com.swp391.cclearly.repository.RefundRepository;
+import com.swp391.cclearly.repository.SystemConfigRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class OrderService {
   private final AddressRepository addressRepository;
   private final RefundRepository refundRepository;
   private final OrderItemRepository orderItemRepository;
+  private final SystemConfigRepository systemConfigRepository;
 
   public ApiResponse<List<OrderResponse>> getUserOrders(User user) {
     List<Order> orders = orderRepository.findByUserOrderByOrderIdDesc(user);
@@ -96,8 +98,6 @@ public class OrderService {
     boolean hasPreorder = cart.getCartItems().stream()
         .anyMatch(ci -> Boolean.TRUE.equals(ci.getVariant().getIsPreorder()));
 
-    boolean isDeposit = hasPreorder && "DEPOSIT".equalsIgnoreCase(request.getPaymentType());
-
     Order order = Order.builder()
         .user(user)
         .code(orderCode)
@@ -105,24 +105,23 @@ public class OrderService {
         .address(address)
         .isPreorder(hasPreorder ? true : null)
         .preorderDeadline(hasPreorder ? java.time.LocalDate.now().plusDays(7) : null)
-        .paymentType(hasPreorder ? (isDeposit ? "DEPOSIT" : "FULL") : null)
+        .paymentType(hasPreorder ? "DEPOSIT" : null)
         .build();
 
-    // Build order items from cart
+    // Build order items from cart — always use full price
     List<OrderItem> orderItems = new ArrayList<>();
     BigDecimal total = BigDecimal.ZERO;
+    BigDecimal preorderTotal = BigDecimal.ZERO;
 
     for (var cartItem : cart.getCartItems()) {
       ProductVariant v = cartItem.getVariant();
       BigDecimal price = v.getSalePrice() != null ? v.getSalePrice() : v.getProduct().getBasePrice();
-
-      // If deposit mode and the variant is preorder, charge 50%
-      if (isDeposit && Boolean.TRUE.equals(v.getIsPreorder())) {
-        price = price.multiply(new BigDecimal("0.5"));
-      }
-
       BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
       total = total.add(lineTotal);
+
+      if (Boolean.TRUE.equals(v.getIsPreorder())) {
+        preorderTotal = preorderTotal.add(lineTotal);
+      }
 
       OrderItem oi = OrderItem.builder()
           .order(order)
@@ -135,6 +134,62 @@ public class OrderService {
 
     order.setFinalAmount(total);
     order.getOrderItems().addAll(orderItems);
+
+    // Compute shipping fee from system config
+    BigDecimal defaultShippingFee = systemConfigRepository.findByConfigKey("default_shipping_fee")
+        .map(c -> new BigDecimal(c.getConfigValue()))
+        .orElse(new BigDecimal("30000"));
+    BigDecimal freeShippingThreshold = systemConfigRepository.findByConfigKey("free_shipping_threshold")
+        .map(c -> new BigDecimal(c.getConfigValue()))
+        .orElse(new BigDecimal("500000"));
+
+    BigDecimal shippingFee = total.compareTo(freeShippingThreshold) >= 0
+        ? BigDecimal.ZERO : defaultShippingFee;
+    order.setShippingFee(shippingFee);
+    order.setFinalAmount(total.add(shippingFee));
+
+    order = orderRepository.save(order);
+
+    // Create Payment records
+    if (hasPreorder) {
+      // Preorder: deposit = 50% of preorder items' value, paid via PAYOS
+      BigDecimal depositAmount = preorderTotal.multiply(new BigDecimal("0.5"));
+      BigDecimal codRemainder = total.subtract(depositAmount);
+
+      Payment depositPayment = Payment.builder()
+          .order(order)
+          .method("PAYOS")
+          .amount(depositAmount)
+          .status("COMPLETED")
+          .payosOrderCode("PAYOS-" + orderCode)
+          .build();
+      order.getPayments().add(depositPayment);
+
+      if (codRemainder.compareTo(BigDecimal.ZERO) > 0) {
+        Payment codPayment = Payment.builder()
+            .order(order)
+            .method("COD")
+            .amount(codRemainder)
+            .status("PENDING")
+            .build();
+        order.getPayments().add(codPayment);
+      }
+    } else {
+      // Non-preorder: single payment
+      String method = request.getPaymentMethod() != null
+          ? request.getPaymentMethod().toUpperCase() : "COD";
+      if ("BANKING".equalsIgnoreCase(request.getPaymentMethod())) {
+        method = "PAYOS";
+      }
+      Payment payment = Payment.builder()
+          .order(order)
+          .method(method)
+          .amount(total)
+          .status("COD".equals(method) ? "PENDING" : "COMPLETED")
+          .payosOrderCode("PAYOS".equals(method) ? "PAYOS-" + orderCode : null)
+          .build();
+      order.getPayments().add(payment);
+    }
     order = orderRepository.save(order);
 
     // Clear cart
@@ -331,8 +386,21 @@ public class OrderService {
 
     // Get payment method from first payment if exists
     String paymentMethod = o.getPayments() != null && !o.getPayments().isEmpty()
-        ? o.getPayments().iterator().next().getClass().getSimpleName()
+        ? o.getPayments().iterator().next().getMethod()
         : null;
+
+    // Compute paidAmount (sum of COMPLETED payments) and codAmount
+    BigDecimal paidAmount = BigDecimal.ZERO;
+    if (o.getPayments() != null) {
+      for (Payment p : o.getPayments()) {
+        if ("COMPLETED".equalsIgnoreCase(p.getStatus()) && p.getAmount() != null) {
+          paidAmount = paidAmount.add(p.getAmount());
+        }
+      }
+    }
+    BigDecimal codAmount = o.getFinalAmount() != null
+        ? o.getFinalAmount().subtract(paidAmount).max(BigDecimal.ZERO)
+        : BigDecimal.ZERO;
 
     return OrderResponse.builder()
         .orderId(o.getOrderId())
@@ -341,12 +409,16 @@ public class OrderService {
         .status(o.getStatus())
         .type(type)
         .finalAmount(o.getFinalAmount())
+        .shippingFee(o.getShippingFee())
         .customerEmail(o.getUser() != null ? o.getUser().getEmail() : null)
         .trackingNumber(o.getTrackingNumber())
         .shippingStreet(o.getAddress() != null ? o.getAddress().getStreet() : null)
         .shippingCity(o.getAddress() != null ? o.getAddress().getCity() : null)
         .shippingPhone(o.getUser() != null ? o.getUser().getPhoneNumber() : null)
         .recipientName(o.getUser() != null ? o.getUser().getFullName() : null)
+        .paymentMethod(paymentMethod)
+        .paidAmount(paidAmount)
+        .codAmount(codAmount)
         .isPreorder(o.getIsPreorder())
         .preorderDeadline(o.getPreorderDeadline())
         .paymentType(o.getPaymentType())

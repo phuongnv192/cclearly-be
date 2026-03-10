@@ -55,6 +55,9 @@ public class Order {
   @Column(name = "payment_type", length = 20)
   private String paymentType; // DEPOSIT or FULL
 
+  @Column(name = "shipping_fee", precision = 19, scale = 2)
+  private BigDecimal shippingFee;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")
   private Address address;
