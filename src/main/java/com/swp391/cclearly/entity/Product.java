@@ -33,6 +33,9 @@ public class Product {
   @Column(name = "base_price", precision = 19, scale = 2)
   private BigDecimal basePrice;
 
+  @Column(name = "description", columnDefinition = "NVARCHAR(MAX)")
+  private String description;
+
   @Column(name = "is_active")
   private Boolean isActive;
 

@@ -87,6 +87,7 @@ public class ProductService {
         .categoryType(request.getType())
         .subCategory(request.getSubCategory())
         .basePrice(request.getPrice())
+        .description(request.getDescription())
         .isActive(true)
         .variants(new HashSet<>())
         .images(new HashSet<>())
@@ -179,6 +180,7 @@ public class ProductService {
     if (request.getType() != null) product.setCategoryType(request.getType());
     if (request.getSubCategory() != null) product.setSubCategory(request.getSubCategory());
     if (request.getPrice() != null) product.setBasePrice(request.getPrice());
+    if (request.getDescription() != null) product.setDescription(request.getDescription());
     if (request.getIsActive() != null) product.setIsActive(request.getIsActive());
 
     // Update frame attributes
@@ -368,6 +370,7 @@ public class ProductService {
         .isSale(isSale)
         .salePrice(isSale ? minSalePrice : null)
         .images(images)
+        .description(p.getDescription())
         .variants(variants);
 
     if (p.getProductFrame() != null) {
