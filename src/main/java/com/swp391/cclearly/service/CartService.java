@@ -120,6 +120,14 @@ public class CartService {
   }
 
   private CartResponse toResponse(Cart cart) {
+    if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+      return CartResponse.builder()
+          .cartId(cart.getCartId())
+          .items(List.of())
+          .totalItems(0)
+          .totalAmount(BigDecimal.ZERO)
+          .build();
+    }
     List<CartResponse.CartItemResponse> items = cart.getCartItems().stream()
         .map(ci -> {
           ProductVariant v = ci.getVariant();
