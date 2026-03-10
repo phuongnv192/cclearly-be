@@ -91,7 +91,7 @@ public class SecurityConfig {
             .requestMatchers("/api/banners/**").hasAnyRole("ADMIN", "MANAGER")
 
             // 🔒 Customer endpoints
-            .requestMatchers("/api/users/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER", "SALES_STAFF")
+            .requestMatchers("/api/users/**").hasAnyRole("CUSTOMER", "ADMIN", "MANAGER", "SALES_STAFF", "OPERATION_STAFF")
             .requestMatchers("/api/orders/**").authenticated()
             .requestMatchers("/api/cart/**").authenticated()
 
