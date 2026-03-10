@@ -17,5 +17,5 @@ public class PromotionResponse {
   private BigDecimal maxDiscount;
   private Integer usageLimit;
   private long usageCount;
-  private boolean isActive;
+  private Boolean isActive;
 }
