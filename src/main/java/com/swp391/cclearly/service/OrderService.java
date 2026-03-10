@@ -91,11 +91,21 @@ public class OrderService {
 
     // Build order
     String orderCode = "CC" + System.currentTimeMillis();
+
+    // Check if any cart item is a preorder variant
+    boolean hasPreorder = cart.getCartItems().stream()
+        .anyMatch(ci -> Boolean.TRUE.equals(ci.getVariant().getIsPreorder()));
+
+    boolean isDeposit = hasPreorder && "DEPOSIT".equalsIgnoreCase(request.getPaymentType());
+
     Order order = Order.builder()
         .user(user)
         .code(orderCode)
         .status("PENDING")
         .address(address)
+        .isPreorder(hasPreorder ? true : null)
+        .preorderDeadline(hasPreorder ? java.time.LocalDate.now().plusDays(7) : null)
+        .paymentType(hasPreorder ? (isDeposit ? "DEPOSIT" : "FULL") : null)
         .build();
 
     // Build order items from cart
@@ -105,6 +115,12 @@ public class OrderService {
     for (var cartItem : cart.getCartItems()) {
       ProductVariant v = cartItem.getVariant();
       BigDecimal price = v.getSalePrice() != null ? v.getSalePrice() : v.getProduct().getBasePrice();
+
+      // If deposit mode and the variant is preorder, charge 50%
+      if (isDeposit && Boolean.TRUE.equals(v.getIsPreorder())) {
+        price = price.multiply(new BigDecimal("0.5"));
+      }
+
       BigDecimal lineTotal = price.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
       total = total.add(lineTotal);
 
@@ -331,6 +347,9 @@ public class OrderService {
         .shippingCity(o.getAddress() != null ? o.getAddress().getCity() : null)
         .shippingPhone(o.getUser() != null ? o.getUser().getPhoneNumber() : null)
         .recipientName(o.getUser() != null ? o.getUser().getFullName() : null)
+        .isPreorder(o.getIsPreorder())
+        .preorderDeadline(o.getPreorderDeadline())
+        .paymentType(o.getPaymentType())
         .createdAt(o.getCreatedAt())
         .items(items)
         .build();
