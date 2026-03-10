@@ -1,5 +1,6 @@
 package com.swp391.cclearly.config;
 
+import com.swp391.cclearly.repository.SystemConfigRepository;
 import com.swp391.cclearly.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final UserRepository userRepository;
+  private final SystemConfigRepository systemConfigRepository;
 
   @Override
   protected void doFilterInternal(
@@ -58,6 +60,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extract role from token
             String role = jwtService.extractRole(token);
 
+            // During maintenance, reject all non-ADMIN requests
+            if (!"ADMIN".equals(role) && isMaintenanceMode()) {
+              response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+              response.setContentType("application/json;charset=UTF-8");
+              response.getWriter().write(
+                  "{\"success\":false,\"message\":\"Hệ thống đang bảo trì\"}");
+              return;
+            }
+
             // Create authentication with role
             var authorities =
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
@@ -78,5 +89,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private boolean isMaintenanceMode() {
+    return systemConfigRepository.findByConfigKey("maintenance_mode")
+        .map(c -> "true".equalsIgnoreCase(c.getConfigValue()))
+        .orElse(false);
   }
 }
