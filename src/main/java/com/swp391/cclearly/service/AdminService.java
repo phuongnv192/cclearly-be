@@ -212,7 +212,8 @@ public class AdminService {
     return ApiResponse.success("Cập nhật người dùng thành công", toAdminUserResponse(user));
   }
 
-  public ApiResponse<RevenueResponse> getRevenue() {
+  public ApiResponse<RevenueResponse> getRevenue(int days) {
+    ZoneId zoneId = ZoneId.of("Asia/Ho_Chi_Minh");
     List<Order> deliveredOrders = orderRepository.findAll().stream()
         .filter(o -> "DELIVERED".equals(o.getStatus()))
         .collect(Collectors.toList());
@@ -222,9 +223,23 @@ public class AdminService {
         .filter(a -> a != null)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // This/Last month revenue - simplified
+    // This month / Last month revenue
+    YearMonth thisMonth = YearMonth.now(zoneId);
+    YearMonth lastMonth = thisMonth.minusMonths(1);
+
     BigDecimal thisMonthRevenue = BigDecimal.ZERO;
     BigDecimal lastMonthRevenue = BigDecimal.ZERO;
+
+    for (Order o : deliveredOrders) {
+      if (o.getCreatedAt() != null && o.getFinalAmount() != null) {
+        YearMonth orderYm = YearMonth.from(o.getCreatedAt().atZone(zoneId));
+        if (orderYm.equals(thisMonth)) {
+          thisMonthRevenue = thisMonthRevenue.add(o.getFinalAmount());
+        } else if (orderYm.equals(lastMonth)) {
+          lastMonthRevenue = lastMonthRevenue.add(o.getFinalAmount());
+        }
+      }
+    }
 
     double growthPercent = 0.0;
     if (lastMonthRevenue.compareTo(BigDecimal.ZERO) > 0) {
@@ -233,12 +248,38 @@ public class AdminService {
           .doubleValue() * 100;
     }
 
+    // Revenue by day (last N days)
+    int numDays = Math.max(1, Math.min(days, 365));
+    LocalDate today = LocalDate.now(zoneId);
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    List<RevenueResponse.DailyRevenue> revenueByDay = new ArrayList<>();
+    for (int i = numDays - 1; i >= 0; i--) {
+      LocalDate day = today.minusDays(i);
+      BigDecimal dayRevenue = BigDecimal.ZERO;
+      long dayOrders = 0;
+      for (Order o : deliveredOrders) {
+        if (o.getCreatedAt() != null) {
+          LocalDate orderDate = o.getCreatedAt().atZone(zoneId).toLocalDate();
+          if (orderDate.equals(day)) {
+            dayRevenue = dayRevenue.add(
+                o.getFinalAmount() != null ? o.getFinalAmount() : BigDecimal.ZERO);
+            dayOrders++;
+          }
+        }
+      }
+      revenueByDay.add(RevenueResponse.DailyRevenue.builder()
+          .date(day.format(dateFormatter))
+          .revenue(dayRevenue)
+          .orders(dayOrders)
+          .build());
+    }
+
     RevenueResponse response = RevenueResponse.builder()
         .totalRevenue(totalRevenue)
         .thisMonthRevenue(thisMonthRevenue)
         .lastMonthRevenue(lastMonthRevenue)
         .growthPercent(growthPercent)
-        .revenueByDay(new ArrayList<>())
+        .revenueByDay(revenueByDay)
         .build();
 
     return ApiResponse.success("Lấy doanh thu thành công", response);

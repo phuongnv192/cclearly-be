@@ -69,8 +69,9 @@ public class AdminController {
 
   @Operation(summary = "Lấy thống kê doanh thu")
   @GetMapping("/revenue")
-  public ResponseEntity<ApiResponse<RevenueResponse>> getRevenue() {
-    return ResponseEntity.ok(adminService.getRevenue());
+  public ResponseEntity<ApiResponse<RevenueResponse>> getRevenue(
+      @RequestParam(defaultValue = "7") int days) {
+    return ResponseEntity.ok(adminService.getRevenue(days));
   }
 
   @Operation(summary = "Lấy cấu hình hệ thống")
