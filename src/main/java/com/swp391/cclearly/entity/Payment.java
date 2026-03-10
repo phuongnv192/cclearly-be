@@ -1,6 +1,7 @@
 package com.swp391.cclearly.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.*;
 
@@ -24,6 +25,9 @@ public class Payment {
 
   @Column(name = "method", length = 50)
   private String method;
+
+  @Column(name = "amount", precision = 19, scale = 2)
+  private BigDecimal amount;
 
   @Column(name = "status", length = 50)
   private String status;
