@@ -168,28 +168,28 @@ IF NOT EXISTS (SELECT * FROM [Master_Lens_Technologies] WHERE name = N'Chống t
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Ray-Ban Aviator Classic')
 BEGIN
     DECLARE @p1 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p1, N'Ray-Ban Aviator Classic', 'FRAME', 'SUNGLASSES', 3500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p1, N'Ray-Ban Aviator Classic', 'FRAME', N'Kính mát', 3500000, 1);
     INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@p1, N'Kim loại', N'Phi công', 58, 14, 135);
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Oakley Holbrook')
 BEGIN
     DECLARE @p2 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p2, N'Oakley Holbrook', 'FRAME', 'SUNGLASSES', 2800000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p2, N'Oakley Holbrook', 'FRAME', N'Kính mát', 2800000, 1);
     INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@p2, N'Nhựa', N'Vuông', 55, 18, 137);
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Gucci GG0061S')
 BEGIN
     DECLARE @p3 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p3, N'Gucci GG0061S', 'FRAME', 'OPTICAL', 7500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p3, N'Gucci GG0061S', 'FRAME', N'Gọng cận', 7500000, 1);
     INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@p3, N'Acetate', N'Mắt mèo', 56, 15, 140);
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Tommy Hilfiger TH1794')
 BEGIN
     DECLARE @p4 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p4, N'Tommy Hilfiger TH1794', 'FRAME', 'KIDS', 1800000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@p4, N'Tommy Hilfiger TH1794', 'FRAME', N'Trẻ em', 1800000, 1);
     INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@p4, N'Kim loại', N'Chữ nhật', 52, 17, 140);
 END;
 
@@ -199,43 +199,60 @@ END;
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Essilor Crizal Sapphire')
 BEGIN
     DECLARE @l1 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l1, N'Essilor Crizal Sapphire', 'LENS', 'PRESCRIPTION', 2500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l1, N'Essilor Crizal Sapphire', 'LENS', N'Tròng cận', 2500000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l1, N'Nhựa CR-39', N'Đơn tròng');
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Zeiss Digital Lens')
 BEGIN
     DECLARE @l2 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l2, N'Zeiss Digital Lens', 'LENS', 'PRESCRIPTION', 4500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l2, N'Zeiss Digital Lens', 'LENS', N'Tròng cận', 4500000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l2, N'Polycarbonate', N'Đa tròng lũy tiến');
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Hoya Blue Control')
 BEGIN
     DECLARE @l3 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l3, N'Hoya Blue Control', 'LENS', 'PRESCRIPTION', 1800000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l3, N'Hoya Blue Control', 'LENS', N'Tròng cận', 1800000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l3, N'Nhựa CR-39', N'Đơn tròng');
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Nikon Lite AS')
 BEGIN
     DECLARE @l4 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l4, N'Nikon Lite AS', 'LENS', 'PRESCRIPTION', 2200000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l4, N'Nikon Lite AS', 'LENS', N'Tròng cận', 2200000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l4, N'Trivex', N'Đơn tròng');
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Rodenstock Multigressiv')
 BEGIN
     DECLARE @l5 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l5, N'Rodenstock Multigressiv', 'LENS', 'PRESCRIPTION', 5500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l5, N'Rodenstock Multigressiv', 'LENS', N'Tròng cận', 5500000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l5, N'Thủy tinh', N'Đa tròng lũy tiến');
 END;
 
 IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Chemi Crystal')
 BEGIN
     DECLARE @l6 UNIQUEIDENTIFIER = NEWID();
-    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l6, N'Chemi Crystal', 'LENS', 'SUN', 1500000, 1);
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@l6, N'Chemi Crystal', 'LENS', N'Tròng mát', 1500000, 1);
     INSERT INTO [Product_Lenses] (product_id, material, lens_type) VALUES (@l6, N'MR-8', N'Đơn tròng');
+END;
+
+-- =============================================
+-- 9a. PRODUCTS - PREORDER FRAMES
+-- =============================================
+IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Prada PR 17WV')
+BEGIN
+    DECLARE @pp1 UNIQUEIDENTIFIER = NEWID();
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@pp1, N'Prada PR 17WV', 'FRAME', N'Gọng cận', 8500000, 1);
+    INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@pp1, N'Acetate', N'Vuông', 54, 18, 140);
+END;
+
+IF NOT EXISTS (SELECT * FROM [Products] WHERE name = N'Dior DiorBlackSuitO S1I')
+BEGIN
+    DECLARE @pp2 UNIQUEIDENTIFIER = NEWID();
+    INSERT INTO [Products] (product_id, name, category_type, sub_category, base_price, is_active) VALUES (@pp2, N'Dior DiorBlackSuitO S1I', 'FRAME', N'Kính mát', 12000000, 1);
+    INSERT INTO [Product_Frames] (product_id, material, shape, lens_width_mm, bridge_width_mm, temple_length_mm) VALUES (@pp2, N'Acetate', N'Tròn', 52, 20, 145);
 END;
 
 -- =============================================
@@ -430,6 +447,23 @@ IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'CH-CR-1.6')
 IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'CH-CR-1.67')
     INSERT INTO [Product_Variants] (variant_id, product_id, sku, color_name, refractive_index, sale_price, is_preorder)
     SELECT NEWID(), product_id, 'CH-CR-1.67', NULL, 1.67, 3000000, 0 FROM [Products] WHERE name = N'Chemi Crystal';
+
+-- Preorder frame variants
+IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'PR-17WV-BLK')
+    INSERT INTO [Product_Variants] (variant_id, product_id, sku, color_name, sale_price, is_preorder, expected_availability)
+    SELECT NEWID(), product_id, 'PR-17WV-BLK', N'Đen', 8500000, 1, '2026-05-01' FROM [Products] WHERE name = N'Prada PR 17WV';
+
+IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'PR-17WV-TORT')
+    INSERT INTO [Product_Variants] (variant_id, product_id, sku, color_name, sale_price, is_preorder, expected_availability)
+    SELECT NEWID(), product_id, 'PR-17WV-TORT', N'Đồi mồi', 8500000, 1, '2026-05-01' FROM [Products] WHERE name = N'Prada PR 17WV';
+
+IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'DIOR-BS-BLK')
+    INSERT INTO [Product_Variants] (variant_id, product_id, sku, color_name, sale_price, is_preorder, expected_availability)
+    SELECT NEWID(), product_id, 'DIOR-BS-BLK', N'Đen', 12000000, 1, '2026-06-15' FROM [Products] WHERE name = N'Dior DiorBlackSuitO S1I';
+
+IF NOT EXISTS (SELECT * FROM [Product_Variants] WHERE sku = 'DIOR-BS-HAVANA')
+    INSERT INTO [Product_Variants] (variant_id, product_id, sku, color_name, sale_price, is_preorder, expected_availability)
+    SELECT NEWID(), product_id, 'DIOR-BS-HAVANA', N'Nâu Havana', 12500000, 1, '2026-06-15' FROM [Products] WHERE name = N'Dior DiorBlackSuitO S1I';
 
 -- =============================================
 -- 11. PRODUCT_IMAGES
@@ -626,6 +660,31 @@ INSERT INTO [Inventory_Stock] (variant_id, warehouse_id, quantity_on_hand)
 SELECT v.variant_id, w.warehouse_id, 55
 FROM [Product_Variants] v, [Warehouses] w
 WHERE v.sku = 'CH-CR-1.67' AND w.name = N'Kho chính Hà Nội'
+AND NOT EXISTS (SELECT 1 FROM [Inventory_Stock] s WHERE s.variant_id = v.variant_id AND s.warehouse_id = w.warehouse_id);
+
+-- Preorder variants - 0 stock (will be available later)
+INSERT INTO [Inventory_Stock] (variant_id, warehouse_id, quantity_on_hand)
+SELECT v.variant_id, w.warehouse_id, 0
+FROM [Product_Variants] v, [Warehouses] w
+WHERE v.sku = 'PR-17WV-BLK' AND w.name = N'Kho chính Hà Nội'
+AND NOT EXISTS (SELECT 1 FROM [Inventory_Stock] s WHERE s.variant_id = v.variant_id AND s.warehouse_id = w.warehouse_id);
+
+INSERT INTO [Inventory_Stock] (variant_id, warehouse_id, quantity_on_hand)
+SELECT v.variant_id, w.warehouse_id, 0
+FROM [Product_Variants] v, [Warehouses] w
+WHERE v.sku = 'PR-17WV-TORT' AND w.name = N'Kho chính Hà Nội'
+AND NOT EXISTS (SELECT 1 FROM [Inventory_Stock] s WHERE s.variant_id = v.variant_id AND s.warehouse_id = w.warehouse_id);
+
+INSERT INTO [Inventory_Stock] (variant_id, warehouse_id, quantity_on_hand)
+SELECT v.variant_id, w.warehouse_id, 0
+FROM [Product_Variants] v, [Warehouses] w
+WHERE v.sku = 'DIOR-BS-BLK' AND w.name = N'Kho chính Hà Nội'
+AND NOT EXISTS (SELECT 1 FROM [Inventory_Stock] s WHERE s.variant_id = v.variant_id AND s.warehouse_id = w.warehouse_id);
+
+INSERT INTO [Inventory_Stock] (variant_id, warehouse_id, quantity_on_hand)
+SELECT v.variant_id, w.warehouse_id, 0
+FROM [Product_Variants] v, [Warehouses] w
+WHERE v.sku = 'DIOR-BS-HAVANA' AND w.name = N'Kho chính Hà Nội'
 AND NOT EXISTS (SELECT 1 FROM [Inventory_Stock] s WHERE s.variant_id = v.variant_id AND s.warehouse_id = w.warehouse_id);
 
 -- =============================================
