@@ -2,6 +2,7 @@ package com.swp391.cclearly.dto.order;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -24,6 +25,9 @@ public class OrderResponse {
   private String trackingNumber;
   private String notes;
   private String paymentMethod;
+  private Boolean isPreorder;
+  private LocalDate preorderDeadline;
+  private String paymentType; // DEPOSIT or FULL
   private Instant createdAt;
   private List<OrderItemResponse> items;
 

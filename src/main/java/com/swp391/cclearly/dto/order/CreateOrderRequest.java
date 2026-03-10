@@ -26,5 +26,7 @@ public class CreateOrderRequest {
 
   private String paymentMethod; // cod, payos
 
+  private String paymentType; // DEPOSIT (50%) or FULL (100%) — for preorder
+
   private String couponCode;
 }

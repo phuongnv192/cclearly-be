@@ -3,6 +3,7 @@ package com.swp391.cclearly.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +45,15 @@ public class Order {
 
   @Column(name = "created_at")
   private Instant createdAt;
+
+  @Column(name = "is_preorder")
+  private Boolean isPreorder;
+
+  @Column(name = "preorder_deadline")
+  private LocalDate preorderDeadline;
+
+  @Column(name = "payment_type", length = 20)
+  private String paymentType; // DEPOSIT or FULL
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id")
