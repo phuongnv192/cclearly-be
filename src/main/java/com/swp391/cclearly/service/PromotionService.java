@@ -55,7 +55,7 @@ public class PromotionService {
     promotion = promotionRepository.save(promotion);
     auditLogService.log("ADD_VOUCHER",
         "Tạo voucher " + promotion.getCode()
-            + " giảm " + promotion.getValue() + ("PERCENT".equals(promotion.getDiscountType()) ? "%" : "đ"));
+            + " giảm " + promotion.getValue() + (promotion.getDiscountType() != null && promotion.getDiscountType().toUpperCase().startsWith("PERCENT") ? "%" : "đ"));
     return ApiResponse.success("Tạo khuyến mãi thành công", toResponse(promotion));
   }
 
