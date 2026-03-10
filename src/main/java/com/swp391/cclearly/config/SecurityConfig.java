@@ -87,7 +87,8 @@ public class SecurityConfig {
             // 🔒 Promotions - Admin & Manager
             .requestMatchers("/api/promotions/**").hasAnyRole("ADMIN", "MANAGER")
 
-            // 🔒 Banners - Admin only
+            // ✅ Banners - Active banners public, management Admin/Manager only
+            .requestMatchers(HttpMethod.GET, "/api/banners/active").permitAll()
             .requestMatchers("/api/banners/**").hasAnyRole("ADMIN", "MANAGER")
 
             // 🔒 Customer endpoints
