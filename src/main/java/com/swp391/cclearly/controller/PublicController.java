@@ -16,6 +16,15 @@ public class PublicController {
 
   private final SystemConfigRepository systemConfigRepository;
 
+  @GetMapping("/maintenance-status")
+  public ApiResponse<Map<String, Object>> getMaintenanceStatus() {
+    boolean maintenance = systemConfigRepository.findByConfigKey("maintenance_mode")
+        .map(c -> "true".equalsIgnoreCase(c.getConfigValue()))
+        .orElse(false);
+
+    return ApiResponse.success("OK", Map.of("maintenance", maintenance));
+  }
+
   @GetMapping("/shipping-config")
   public ApiResponse<Map<String, Object>> getShippingConfig() {
     BigDecimal defaultShippingFee = systemConfigRepository.findByConfigKey("default_shipping_fee")
