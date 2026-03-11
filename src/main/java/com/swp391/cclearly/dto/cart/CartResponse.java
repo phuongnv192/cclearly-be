@@ -23,6 +23,7 @@ public class CartResponse {
     private String variantSku;
     private String colorName;
     private String productType;
+    private Float refractiveIndex;
     private BigDecimal price;
     private Integer quantity;
     private String imageUrl;

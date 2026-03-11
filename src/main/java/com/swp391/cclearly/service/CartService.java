@@ -6,6 +6,7 @@ import com.swp391.cclearly.dto.cart.CartResponse;
 import com.swp391.cclearly.dto.cart.UpdateCartItemRequest;
 import com.swp391.cclearly.entity.Cart;
 import com.swp391.cclearly.entity.CartItem;
+import com.swp391.cclearly.entity.Product;
 import com.swp391.cclearly.entity.ProductImage;
 import com.swp391.cclearly.entity.ProductVariant;
 import com.swp391.cclearly.entity.User;
@@ -13,6 +14,7 @@ import com.swp391.cclearly.exception.BadRequestException;
 import com.swp391.cclearly.exception.ResourceNotFoundException;
 import com.swp391.cclearly.repository.CartItemRepository;
 import com.swp391.cclearly.repository.CartRepository;
+import com.swp391.cclearly.repository.ProductRepository;
 import com.swp391.cclearly.repository.ProductVariantRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,6 +33,7 @@ public class CartService {
   private final CartRepository cartRepository;
   private final CartItemRepository cartItemRepository;
   private final ProductVariantRepository productVariantRepository;
+  private final ProductRepository productRepository;
 
   public ApiResponse<CartResponse> getCart(User user) {
     Cart cart = getOrCreateCart(user);
@@ -40,12 +43,37 @@ public class CartService {
   public ApiResponse<CartResponse> addToCart(User user, AddCartItemRequest request) {
     Cart cart = getOrCreateCart(user);
 
-    ProductVariant variant = productVariantRepository.findById(request.getVariantId())
-        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+    // Resolve variant: use variantId if provided, otherwise look up by productId
+    ProductVariant variant;
+    if (request.getVariantId() != null) {
+      variant = productVariantRepository.findById(request.getVariantId())
+          .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+    } else if (request.getProductId() != null) {
+      Product product = productRepository.findById(request.getProductId())
+          .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
+      // Find existing variant or auto-create a default one
+      variant = productVariantRepository.findAll().stream()
+          .filter(v -> v.getProduct().getProductId().equals(request.getProductId()))
+          .findFirst()
+          .orElseGet(() -> {
+            ProductVariant defaultVariant = ProductVariant.builder()
+                .product(product)
+                .sku(product.getName() != null ? product.getName().substring(0, Math.min(product.getName().length(), 10)).toUpperCase().replaceAll("\\s+", "-") + "-DEFAULT" : "DEFAULT")
+                .colorName("Mặc định")
+                .salePrice(product.getBasePrice())
+                .isPreorder(false)
+                .build();
+            return productVariantRepository.save(defaultVariant);
+          });
+    } else {
+      throw new BadRequestException("Vui lòng chọn sản phẩm");
+    }
+
+    UUID variantId = variant.getVariantId();
 
     // If item with same variant already exists, increase quantity
     Optional<CartItem> existingItem = cart.getCartItems().stream()
-        .filter(ci -> ci.getVariant().getVariantId().equals(request.getVariantId()))
+        .filter(ci -> ci.getVariant().getVariantId().equals(variantId))
         .findFirst();
 
     if (existingItem.isPresent()) {
@@ -131,10 +159,12 @@ public class CartService {
     List<CartResponse.CartItemResponse> items = cart.getCartItems().stream()
         .map(ci -> {
           ProductVariant v = ci.getVariant();
-          String imageUrl = v.getImages().stream()
-              .map(ProductImage::getImageUrl)
-              .findFirst()
-              .orElse(null);
+          String imageUrl = v.getImages() != null
+              ? v.getImages().stream()
+                  .map(ProductImage::getImageUrl)
+                  .findFirst()
+                  .orElse(null)
+              : null;
 
           BigDecimal price = v.getSalePrice() != null ? v.getSalePrice() : v.getProduct().getBasePrice();
 
@@ -145,6 +175,7 @@ public class CartService {
               .variantSku(v.getSku())
               .colorName(v.getColorName())
               .productType(v.getProduct().getCategoryType())
+              .refractiveIndex(v.getRefractiveIndex())
               .price(price)
               .quantity(ci.getQuantity())
               .imageUrl(imageUrl)

@@ -41,6 +41,9 @@ public class Order {
   @JoinColumn(name = "coupon_id", referencedColumnName = "promotion_id")
   private Promotion coupon;
 
+  @Column(name = "discount_amount", precision = 19, scale = 2)
+  private BigDecimal discountAmount;
+
   @Column(name = "tracking_number", length = 100)
   private String trackingNumber;
 

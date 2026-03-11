@@ -14,6 +14,7 @@ import com.swp391.cclearly.entity.Payment;
 import com.swp391.cclearly.entity.Prescription;
 import com.swp391.cclearly.entity.ProductImage;
 import com.swp391.cclearly.entity.ProductVariant;
+import com.swp391.cclearly.entity.Promotion;
 import com.swp391.cclearly.entity.Refund;
 import com.swp391.cclearly.entity.User;
 import com.swp391.cclearly.exception.BadRequestException;
@@ -22,6 +23,7 @@ import com.swp391.cclearly.repository.AddressRepository;
 import com.swp391.cclearly.repository.CartRepository;
 import com.swp391.cclearly.repository.OrderItemRepository;
 import com.swp391.cclearly.repository.OrderRepository;
+import com.swp391.cclearly.repository.PromotionRepository;
 import com.swp391.cclearly.repository.RefundRepository;
 import com.swp391.cclearly.repository.SystemConfigRepository;
 import java.math.BigDecimal;
@@ -48,6 +50,7 @@ public class OrderService {
   private final RefundRepository refundRepository;
   private final OrderItemRepository orderItemRepository;
   private final SystemConfigRepository systemConfigRepository;
+  private final PromotionRepository promotionRepository;
 
   public ApiResponse<List<OrderResponse>> getUserOrders(User user) {
     List<Order> orders = orderRepository.findByUserOrderByOrderIdDesc(user);
@@ -159,7 +162,30 @@ public class OrderService {
     BigDecimal shippingFee = total.compareTo(freeShippingThreshold) >= 0
         ? BigDecimal.ZERO : defaultShippingFee;
     order.setShippingFee(shippingFee);
-    order.setFinalAmount(total.add(shippingFee));
+
+    // Apply coupon if provided
+    BigDecimal discountAmount = BigDecimal.ZERO;
+    if (request.getCouponCode() != null && !request.getCouponCode().isBlank()) {
+      Promotion promo = promotionRepository.findByCode(request.getCouponCode())
+          .orElse(null);
+      if (promo != null && Boolean.TRUE.equals(promo.getIsActive())) {
+        if (promo.getMinOrder() == null || total.compareTo(promo.getMinOrder()) >= 0) {
+          if ("PERCENTAGE".equalsIgnoreCase(promo.getDiscountType())) {
+            discountAmount = total.multiply(promo.getValue())
+                .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.FLOOR);
+            if (promo.getMaxDiscount() != null && discountAmount.compareTo(promo.getMaxDiscount()) > 0) {
+              discountAmount = promo.getMaxDiscount();
+            }
+          } else {
+            discountAmount = promo.getValue() != null ? promo.getValue() : BigDecimal.ZERO;
+          }
+          order.setCoupon(promo);
+          order.setDiscountAmount(discountAmount);
+        }
+      }
+    }
+
+    order.setFinalAmount(total.add(shippingFee).subtract(discountAmount));
 
     order = orderRepository.save(order);
 
@@ -366,15 +392,38 @@ public class OrderService {
               .orElse(null);
           // Determine product type
           String productType = v.getProduct().getCategoryType();
+
+          // Build prescription info if present
+          OrderResponse.PrescriptionInfo rxInfo = null;
+          if (oi.getPrescription() != null) {
+            Prescription rx = oi.getPrescription();
+            rxInfo = OrderResponse.PrescriptionInfo.builder()
+                .imageUrl(rx.getImageUrl())
+                .sphOd(rx.getSphOd())
+                .cylOd(rx.getCylOd())
+                .axisOd(rx.getAxisOd())
+                .addOd(rx.getAddOd())
+                .sphOs(rx.getSphOs())
+                .cylOs(rx.getCylOs())
+                .axisOs(rx.getAxisOs())
+                .addOs(rx.getAddOs())
+                .pd(rx.getPd())
+                .validationStatus(rx.getValidationStatus())
+                .salesNote(rx.getSalesNote())
+                .build();
+          }
+
           return OrderResponse.OrderItemResponse.builder()
               .orderItemId(oi.getOrderItemId())
               .productName(v.getProduct().getName())
               .variantSku(v.getSku())
               .colorName(v.getColorName())
               .productType(productType)
+              .refractiveIndex(v.getRefractiveIndex())
               .unitPrice(oi.getUnitPrice())
               .quantity(1)
               .imageUrl(imageUrl)
+              .prescription(rxInfo)
               .build();
         })
         .collect(Collectors.toList());
@@ -421,6 +470,8 @@ public class OrderService {
         .isPreorder(o.getIsPreorder())
         .preorderDeadline(o.getPreorderDeadline())
         .paymentType(o.getPaymentType())
+        .couponCode(o.getCoupon() != null ? o.getCoupon().getCode() : null)
+        .discountAmount(o.getDiscountAmount())
         .createdAt(o.getCreatedAt())
         .items(items)
         .build();

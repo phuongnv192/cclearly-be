@@ -7,8 +7,11 @@ import lombok.Data;
 
 @Data
 public class AddCartItemRequest {
-  @NotNull(message = "Variant ID không được để trống")
+  // Either variantId or productId must be provided
   private UUID variantId;
+
+  // Fallback for products without variants (e.g. accessories)
+  private UUID productId;
 
   @NotNull(message = "Số lượng không được để trống")
   @Min(value = 1, message = "Số lượng phải ít nhất là 1")

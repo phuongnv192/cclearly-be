@@ -31,6 +31,8 @@ public class OrderResponse {
   private Boolean isPreorder;
   private LocalDate preorderDeadline;
   private String paymentType; // DEPOSIT or FULL
+  private String couponCode;
+  private BigDecimal discountAmount;
   private Instant createdAt;
   private List<OrderItemResponse> items;
 
@@ -42,8 +44,27 @@ public class OrderResponse {
     private String variantSku;
     private String colorName;
     private String productType;
+    private Float refractiveIndex;
     private BigDecimal unitPrice;
     private int quantity;
     private String imageUrl;
+    private PrescriptionInfo prescription;
+  }
+
+  @Data
+  @Builder
+  public static class PrescriptionInfo {
+    private String imageUrl;
+    private BigDecimal sphOd;
+    private BigDecimal cylOd;
+    private Integer axisOd;
+    private BigDecimal addOd;
+    private BigDecimal sphOs;
+    private BigDecimal cylOs;
+    private Integer axisOs;
+    private BigDecimal addOs;
+    private BigDecimal pd;
+    private String validationStatus;
+    private String salesNote;
   }
 }
